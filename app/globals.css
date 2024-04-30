@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Background and text colors */
+  --color-background-light: #ffffff;
+  --color-background-dark: #121212;
+  --color-text-light: #121212;
+  --color-text-dark: #ffffff;
+
+  /* Brand colors for light theme */
+  --brandColor1-light: #e0e0e0; /* Light Gray */
+  --brandColor2-light: #c0c0c0; /* Silver */
+  --brandColor3-light: #a0a0a0; /* Dark Gray */
+  --brandColor4-light: #808080; /* Gray */
+  --brandColor5-light: #606060; /* Dim Gray */
+
+  /* Inverse brand colors for dark theme */
+  --brandColor1-dark: #1f1f1f; 
+  --brandColor2-dark: #3f3f3f;
+  --brandColor3-dark: #5f5f5f; 
+  --brandColor4-dark: #7f7f7f; 
+  --brandColor5-dark: #e0e0e0; 
+}
+
+/* Applying the colors based on theme preference */
+@media (prefers-color-scheme: light) {
+  :root {
+      --color-background: var(--color-background-light);
+      --color-text: var(--color-text-light);
+
+      /* Light theme brand colors */
+      --brandColor1: var(--brandColor1-light);
+      --brandColor2: var(--brandColor2-light);
+      --brandColor3: var(--brandColor3-light);
+      --brandColor4: var(--brandColor4-light);
+      --brandColor5: var(--brandColor5-light);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+      --color-background: var(--color-background-dark);
+      --color-text: var(--color-text-dark);
+
+      /* Dark theme brand colors (inverses) */
+      --brandColor1: var(--brandColor1-dark);
+      --brandColor2: var(--brandColor2-dark);
+      --brandColor3: var(--brandColor3-dark);
+      --brandColor4: var(--brandColor4-dark);
+      --brandColor5: var(--brandColor5-dark);
+  }
+}
+
+/* Usage example */
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  
+}
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
