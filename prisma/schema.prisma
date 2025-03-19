@@ -19,8 +19,10 @@ model User {
   googleId       String?
   emailVerified  DateTime?
   image          String?
+  role           String    @default("ENGINEER")
   accounts       Account[]
   sessions       Session[]
+  createdPumps   PumpModel[]
 }
 
 model Account {
@@ -51,4 +53,57 @@ model VerificationToken {
   token        String   @unique
   expires      DateTime
   @@unique([identifier, token])
+}
+
+model PumpModel {
+  id          Int         @id @default(autoincrement())
+  name        String
+  type        String
+  description String?
+  manufacturer String
+  modelNumber  String
+  maxFlow     Float       // in GPM
+  maxHead     Float       // in feet
+  maxSpeed    Int         // in RPM
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  curves      PumpCurve[]
+  documents   Document[]
+  bom         BOM[]
+  createdBy   User        @relation(fields: [userId], references: [id])
+  userId      Int
+}
+
+model PumpCurve {
+  id          Int       @id @default(autoincrement())
+  pumpModel   PumpModel @relation(fields: [pumpModelId], references: [id])
+  pumpModelId Int
+  speed       Int       // in RPM
+  points      String    // Changed from Json to String - will store JSON as string
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Document {
+  id          Int       @id @default(autoincrement())
+  title       String
+  fileUrl     String
+  fileType    String
+  pumpModel   PumpModel @relation(fields: [pumpModelId], references: [id])
+  pumpModelId Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model BOM {
+  id          Int       @id @default(autoincrement())
+  pumpModel   PumpModel @relation(fields: [pumpModelId], references: [id])
+  pumpModelId Int
+  partNumber  String
+  description String
+  quantity    Int
+  unit        String
+  supplier    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

@@ -10,9 +10,11 @@ const Header = () => {
     const pathname = usePathname();
     const [error, setError] = useState<string>(''); // Explicitly type the error state as string
     const router = useRouter();
-    const onDashboard = pathname.startsWith('/dashboard') &&
-                    !pathname.startsWith('/dashboard/login') &&
-                    !pathname.startsWith('/dashboard/register');
+    
+    // Check if we're on an authenticated page (dashboard or pump-related pages)
+    const isAuthenticatedPage = pathname.startsWith('/dashboard') ||
+                              pathname.startsWith('/pumps') ||
+                              pathname.startsWith('/api');
 
     const handleLogout = async () => {
         try {
@@ -39,21 +41,25 @@ const Header = () => {
         }
       };
 
-    const homeLink = onDashboard ? '/dashboard' : '/';
+    const homeLink = isAuthenticatedPage ? '/dashboard' : '/';
     
     const navLinks = [
         { href: homeLink, label: 'Home' },
     ];
 
-    if (!onDashboard) {
+    if (!isAuthenticatedPage) {
         navLinks.push({ href: '/dashboard/login', label: 'Login' });
         navLinks.push({ href: '/dashboard/register', label: 'Register' });
-    } 
+    } else {
+        // Add pump-related navigation links when authenticated
+        navLinks.push({ href: '/pumps', label: 'Pumps' });
+        navLinks.push({ href: '/pumps/new', label: 'Add Pump' });
+    }
 
     return (
         <header className="md:flex bg-brandColor1">  {/* Use brandColor1 for background */}
             <div className="container mx-auto flex justify-between items-center bg-brandColor1 text-brandColor5 p-4">
-                <h1 className="text-lg text-brandColor4 font-bold">Next.js Boilerplate</h1>
+                <h1 className="text-lg text-brandColor4 font-bold">Pump Selection</h1>
                 <button className="text-brandColor4 md:hidden" onClick={() => setIsOpen(!isOpen)}>
                     <svg className="w-6 h-6" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
                         <path d="M4 6h16M4 12h16m-7 6h7" />
@@ -69,7 +75,7 @@ const Header = () => {
                             </Link>
                         </li>
                     ))}
-                    {onDashboard && (
+                    {isAuthenticatedPage && (
                         <li>
                             <button onClick={handleLogout} className="hover:text-brandColor3">Logout</button>
                         </li>

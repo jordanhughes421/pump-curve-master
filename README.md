@@ -1,110 +1,62 @@
-# Next.js Authentication Boilerplate
+# Pump Performance Curve Manager
 
-This project provides a robust boilerplate for building Next.js applications with integrated user authentication. Utilizing modern technologies such as TypeScript, Tailwind CSS, and Prisma ORM, this template is designed to kick-start development and streamline the process of implementing secure, efficient authentication.
+A modern web application for managing and visualizing pump performance curves. Built with Next.js, TypeScript, and Tailwind CSS.
 
 ## Features
 
-- **Next.js 14**: The foundation of the boilerplate, providing server-side rendering and static generation capabilities.
-- **TypeScript**: Ensures type safety across the application, enhancing development efficiency and reducing runtime errors.
-- **Tailwind CSS**: A utility-first CSS framework for rapid UI development without leaving your HTML.
-- **Prisma ORM**: Next-generation ORM for Node.js and TypeScript, simplifying database workflows with robust modeling and easy data access.
-- **API Routes**: Leveraging Next.js API routes to handle authentication logic securely on the server side.
-- **Environment-Sensitive Configuration**: Using `next.config.mjs`, `.env`, and `.env.local` for maintaining different settings across development, testing, and production environments.
-- **Fully Responsive Layout**: Mobile-first layouts using Tailwind CSS, ensuring the application is accessible on any device.
+- View and manage pump specifications
+- Interactive performance curve visualization
+- Add, edit, and delete pump curves
+- Responsive design for all screen sizes
+- Modern, clean user interface
+
+## Tech Stack
+
+- **Framework**: Next.js 14
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Charts**: Recharts
+- **Database**: Prisma with PostgreSQL
 
 ## Getting Started
 
-### Prerequisites
-
-Ensure you have the following installed:
-- Node.js (v14 or later)
-- npm or yarn
-- A supported SQL database (PostgreSQL, MySQL, etc.), if you plan to use Prisma for handling database operations.
-
-### Installation
-
-1. **Clone the Repository**
+1. Clone the repository:
    ```bash
-   git clone https://github.com/jordanhughes421/nextjs-auth-boilerplate.git
-   cd nextjs-auth-boilerplate
-    ```
-2. **Install Dependencies**
-    Using npm:
+   git clone [repository-url]
+   cd pump-curve-manager
+   ```
 
-    ```bash
-    npm install
-    ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-    Or using yarn:
+3. Set up your environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+   Then edit `.env` with your database configuration.
 
-    ```bash
-    yarn
-    ```
-3. **Set Up Environment Variables**
-Rename the .env.example to .env and update the variables to suit your environment:
+4. Run database migrations:
+   ```bash
+   npx prisma migrate dev
+   ```
 
-    ```plaintext
-    DATABASE_URL="your-database-url"
-    SECRET="your-secret-key"
-    ```
+5. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-4. **Run Prisma Migrations (Optional)**
-    If you are using Prisma, set up your database schema:
-    ```bash
-    npx prisma migrate dev
-    ```
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-5. **Start the Development Server or Database**
-    For Dev Server:
-    ```bash
+## Development
 
-    npm run dev
-    ```
-    Or:
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript compiler check
 
-    ```bash
+## License
 
-    yarn dev
-    ```
-
-    The application will be available at http://localhost:3000.
-
-    For Prisma Database Server:
-    ```bash
-
-    npm run database
-    ```
-    Or:
-
-    ```bash
-
-    yarn database
-    ```
-
-    The application will be available at http://localhost:5555.
-
-**Directory Structure**
-
-    /app: Contains the core application features, including layout components and utility functions.
-        /api: Server-side API routes for handling authentication.
-        /dashboard: Components for the authenticated user's dashboard.
-    /prisma: Contains Prisma schema files for database modeling.
-    /public: Static files like images and the favicon.
-    /utils: Shared utility functions across the application.
-    /components: Shared component functions across the application.
-
-**Customizing**
-
-To customize this boilerplate for your own project:
-
-*Modify the Prisma schema in /prisma/schema.prisma to reflect your database models.*
-*Update the Tailwind configuration in tailwind.config.ts to match your design requirements.*
-*Extend or modify API routes in /app/api to suit your authentication flow.*
-
-**Contributing**
-
-Contributions are welcome! Please fork the repository and submit pull requests with your features or fixes.
-
-**License**
-
-*Distributed under the MIT License. See LICENSE for more information.*
+MIT License - feel free to use this code for your own projects.
