@@ -7,14 +7,20 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: 'media',
   theme: {
     extend: {
       colors: {
+        background: 'var(--color-background)',
+        foreground: 'var(--color-text)',
         brandColor1: 'var(--brandColor1)',
         brandColor2: 'var(--brandColor2)',
         brandColor3: 'var(--brandColor3)',
         brandColor4: 'var(--brandColor4)',
         brandColor5: 'var(--brandColor5)',
+      },
+      minHeight: {
+        'screen': '100vh',
       },
     },
   },
