@@ -23,6 +23,15 @@
     --brandColor3-dark: #5f5f5f; 
     --brandColor4-dark: #7f7f7f; 
     --brandColor5-dark: #e0e0e0; 
+
+    /* Default variable values (needed for Tailwind to work properly) */
+    --color-background: var(--color-background-light);
+    --color-text: var(--color-text-light);
+    --brandColor1: var(--brandColor1-light);
+    --brandColor2: var(--brandColor2-light);
+    --brandColor3: var(--brandColor3-light);
+    --brandColor4: var(--brandColor4-light);
+    --brandColor5: var(--brandColor5-light);
   }
 
   /* Applying the colors based on theme preference */
