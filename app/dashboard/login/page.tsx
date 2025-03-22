@@ -7,7 +7,7 @@ import Cookies from 'js-cookie';
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string>(''); // Explicitly type the error state as string
+  const [error, setError] = useState<string>('');
   const router = useRouter();
   const { user, setUser } = useUser();
 
@@ -29,7 +29,6 @@ const LoginPage = () => {
           throw new Error(data.message || 'Failed to check session');
         }
       } catch (error: unknown) {
-        // Check if the error is an instance of Error and set the message, else set a default error message
         if (error instanceof Error) {
           setError(error.message);
         } else {
@@ -37,7 +36,7 @@ const LoginPage = () => {
         }
       }
     };
-      fetchUserData();
+    fetchUserData();
   }, [router, setUser]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -56,12 +55,11 @@ const LoginPage = () => {
       const data = await response.json();
       if (response.ok) {
         setUser(data.userWithoutPassword);
-        router.push('/dashboard'); // Redirect to the dashboard or another target page
+        router.push('/dashboard');
       } else {
         throw new Error(data.message || 'Failed to login');
       }
     } catch (error: unknown) {
-      // Check if the error is an instance of Error and set the message, else set a default error message
       if (error instanceof Error) {
         setError(error.message);
       } else {
@@ -71,31 +69,51 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Log In</button>
-      </form>
+    <div className="min-h-screen bg-brandColor5 flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
+        <h1 className="text-2xl font-bold text-brandColor1 mb-6">Login</h1>
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-brandColor1 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-brandColor3 rounded-lg focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 transition-colors bg-white text-brandColor1"
+              placeholder="Enter your email"
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-brandColor1 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-brandColor3 rounded-lg focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 transition-colors bg-white text-brandColor1"
+              placeholder="Enter your password"
+            />
+          </div>
+          <button 
+            type="submit"
+            className="w-full px-6 py-2 bg-brandColor1 text-brandColor5 rounded-lg hover:bg-brandColor2 focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 transition-colors"
+          >
+            Log In
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
