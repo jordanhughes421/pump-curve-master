@@ -1,11 +1,11 @@
 datasource db {
   // For development (SQLite)
-  // provider = "sqlite"
-  // url      = "file:./dev.db"
+   provider = "sqlite"
+   url      = "file:./dev.db"
   
   // For production (PostgreSQL on Heroku)
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // provider = "postgresql"
+  // url      = env("DATABASE_URL")
 }
 
 generator client {
