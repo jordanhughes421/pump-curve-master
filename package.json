@@ -5,9 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p $PORT || 3000",
+    "start:dev": "next start",
     "lint": "next lint",
-    "database": "npx prisma studio"
+    "database": "npx prisma studio",
+    "postinstall": "prisma generate && prisma migrate deploy"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.8.0",

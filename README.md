@@ -57,6 +57,98 @@ A modern web application for managing and visualizing pump performance curves. B
 - `npm run lint` - Run ESLint
 - `npm run type-check` - Run TypeScript compiler check
 
+## Deployment to Heroku
+
+This app is configured to be easily deployed to Heroku. Follow these steps:
+
+### Local Development Setup
+
+1. Use the SQLite configuration by editing `prisma/schema.prisma`:
+   ```prisma
+   datasource db {
+     provider = "sqlite"
+     url      = "file:./dev.db"
+     
+     // Comment out the PostgreSQL config
+     // provider = "postgresql"
+     // url      = env("DATABASE_URL")
+   }
+   ```
+
+2. Make sure your `.env` file has:
+   ```
+   DATABASE_URL="file:./prisma/dev.db"
+   NODE_ENV=development
+   NEXTAUTH_URL=http://localhost:3000
+   ```
+
+3. Run the development server:
+   ```
+   npm run dev
+   ```
+
+### Heroku Deployment Setup
+
+1. Install the Heroku CLI: https://devcenter.heroku.com/articles/heroku-cli
+
+2. Login to Heroku:
+   ```
+   heroku login
+   ```
+
+3. Create a new Heroku app:
+   ```
+   heroku create your-app-name
+   ```
+
+4. Add PostgreSQL add-on:
+   ```
+   heroku addons:create heroku-postgresql:hobby-dev
+   ```
+
+5. Use the PostgreSQL configuration in `prisma/schema.prisma`:
+   ```prisma
+   datasource db {
+     // Comment out the SQLite config
+     // provider = "sqlite"
+     // url      = "file:./dev.db"
+     
+     provider = "postgresql"
+     url      = env("DATABASE_URL")
+   }
+   ```
+
+6. Configure environment variables on Heroku:
+   ```
+   heroku config:set NEXTAUTH_URL=https://your-app-name.herokuapp.com
+   heroku config:set NEXTAUTH_SECRET=your-secure-secret-here
+   heroku config:set NODE_ENV=production
+   ```
+
+7. Deploy to Heroku:
+   ```
+   git add .
+   git commit -m "Configure for Heroku deployment"
+   git push heroku main
+   ```
+
+8. Run database migrations:
+   ```
+   heroku run npx prisma migrate deploy
+   ```
+
+9. Open your app:
+   ```
+   heroku open
+   ```
+
+### Switching Between Environments
+
+- For local development: Uncomment SQLite configuration in schema.prisma, comment out PostgreSQL
+- For Heroku deployment: Uncomment PostgreSQL configuration in schema.prisma, comment out SQLite
+
+The rest is handled through environment variables and the package.json scripts.
+
 ## License
 
 MIT License - feel free to use this code for your own projects.
