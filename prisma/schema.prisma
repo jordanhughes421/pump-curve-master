@@ -1,6 +1,11 @@
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // For development (SQLite)
+  // provider = "sqlite"
+  // url      = "file:./dev.db"
+  
+  // For production (PostgreSQL on Heroku)
+   provider = "postgresql"
+   url      = env("DATABASE_URL")
 }
 
 generator client {
