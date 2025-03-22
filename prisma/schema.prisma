@@ -6,6 +6,12 @@ datasource db {
   // For production (PostgreSQL on Heroku)
    provider = "postgresql"
    url      = env("DATABASE_URL")
+   directUrl = env("DATABASE_URL")
+   relationMode = "prisma"
+   // Add connection pool settings
+   poolTimeout = 20
+   pool_timeout = 20
+   connect_timeout = 20
 }
 
 generator client {

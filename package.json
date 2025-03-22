@@ -12,7 +12,7 @@
     "start:dev": "next start",
     "lint": "next lint",
     "database": "npx prisma studio",
-    "postinstall": "prisma generate && prisma migrate deploy"
+    "postinstall": "prisma generate && (npx prisma db push || (sleep 5 && npx prisma db push) || (sleep 10 && npx prisma db push))"
   },
 "dependencies": {
     "@prisma/client": "^5.10.0",
