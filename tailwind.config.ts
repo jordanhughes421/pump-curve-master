@@ -7,6 +7,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        background: 'var(--color-background)',
+        foreground: 'var(--color-text)',
         brandColor1: 'var(--brandColor1)',
         brandColor2: 'var(--brandColor2)',
         brandColor3: 'var(--brandColor3)',
