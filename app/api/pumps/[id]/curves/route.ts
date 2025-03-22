@@ -32,12 +32,18 @@ export async function POST(
   try {
     const { speed, points } = await request.json();
 
-    // Validate that points is a valid JSON string
-    try {
-      JSON.parse(points);
-    } catch (e) {
+    // Validate that points is a string and has the correct format
+    if (typeof points !== 'string' || !points.includes(',')) {
       return NextResponse.json(
-        { error: 'Invalid points data format' },
+        { error: 'Invalid points data format. Expected format: "flow,head,efficiency,power;flow,head,efficiency,power"' },
+        { status: 400 }
+      );
+    }
+
+    // Validate that speed is a number
+    if (typeof speed !== 'number' || isNaN(speed)) {
+      return NextResponse.json(
+        { error: 'Speed must be a valid number' },
         { status: 400 }
       );
     }
