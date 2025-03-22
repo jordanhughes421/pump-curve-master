@@ -7,8 +7,23 @@ import Footer from "./components/footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Fiscal Fox App",
-  description: "Fiscal Fox App",
+  title: "Pump Curve Manager",
+  description: "A professional tool for managing and analyzing pump performance curves. Create, edit, and visualize pump curves with ease.",
+  keywords: "pump curve, pump performance, hydraulic analysis, pump efficiency, pump selection",
+  authors: [{ name: "Pump Curve Manager Team" }],
+  viewport: "width=device-width, initial-scale=1",
+  themeColor: "#ffffff",
+  openGraph: {
+    title: "Pump Curve Manager",
+    description: "A professional tool for managing and analyzing pump performance curves",
+    type: "website",
+    locale: "en_US",
+    siteName: "Pump Curve Manager",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({children,}: Readonly<{children: React.ReactNode;}>) {
