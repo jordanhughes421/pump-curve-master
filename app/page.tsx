@@ -9,20 +9,6 @@ export default function Home() {
         <p className="text-md md:text-lg text-brandColor3">
           Professional pump performance analysis and curve management tool
         </p>
-        <div className="flex gap-4 mt-4">
-          <Link 
-            href="/curves" 
-            className="px-6 py-3 bg-brandColor1 hover:bg-brandColor2 text-brandColor5 rounded-lg transition-colors"
-          >
-            View Curves
-          </Link>
-          <Link 
-            href="/curves/new" 
-            className="px-6 py-3 bg-brandColor4 hover:bg-brandColor3 text-white rounded-lg transition-colors"
-          >
-            Create New Curve
-          </Link>
-        </div>
       </header>
 
       <section className="w-full max-w-3xl grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
