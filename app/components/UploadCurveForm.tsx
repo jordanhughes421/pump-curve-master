@@ -180,7 +180,7 @@ export default function UploadCurveForm({ pumpId, onSuccess, existingCurves, edi
             id="speed"
             value={speed}
             onChange={(e) => setSpeed(e.target.value)}
-            className="w-full px-4 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 bg-white text-brandColor1"
+            className="w-full px-4 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 bg-white text-gray-900"
             required
           />
         </div>
@@ -200,7 +200,7 @@ export default function UploadCurveForm({ pumpId, onSuccess, existingCurves, edi
                     value={point.flow}
                     onChange={(e) => updatePoint(index, 'flow', e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, index, 'flow')}
-                    className="w-full px-3 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 text-brandColor1"
+                    className="w-full px-3 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 text-gray-900"
                     data-index={index}
                     data-field="flow"
                     required
@@ -213,7 +213,7 @@ export default function UploadCurveForm({ pumpId, onSuccess, existingCurves, edi
                     value={point.head}
                     onChange={(e) => updatePoint(index, 'head', e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, index, 'head')}
-                    className="w-full px-3 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 text-brandColor1"
+                    className="w-full px-3 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 text-gray-900"
                     data-index={index}
                     data-field="head"
                     required
@@ -226,7 +226,7 @@ export default function UploadCurveForm({ pumpId, onSuccess, existingCurves, edi
                     value={point.efficiency}
                     onChange={(e) => updatePoint(index, 'efficiency', e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, index, 'efficiency')}
-                    className="w-full px-3 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 text-brandColor1"
+                    className="w-full px-3 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 text-gray-900"
                     data-index={index}
                     data-field="efficiency"
                     required
@@ -240,7 +240,7 @@ export default function UploadCurveForm({ pumpId, onSuccess, existingCurves, edi
                       value={point.power}
                       onChange={(e) => updatePoint(index, 'power', e.target.value)}
                       onKeyDown={(e) => handleKeyDown(e, index, 'power')}
-                      className="w-full px-3 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 text-brandColor1"
+                      className="w-full px-3 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 text-gray-900"
                       data-index={index}
                       data-field="power"
                       required
