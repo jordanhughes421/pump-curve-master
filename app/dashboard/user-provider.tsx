@@ -33,17 +33,17 @@ export const UserProvider: React.FC<{children: ReactNode}> = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/auth/session', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
+        console.log('Checking authentication...');
+        const response = await fetch('/api/auth/session');
+        const data = await response.json();
+        
+        console.log('Session check response:', data);
+        
+        if (response.ok && data.user) {
+          console.log('Setting user from session:', data.user);
           setUser(data.user);
         } else {
+          console.log('No valid session found');
           setUser(null);
         }
       } catch (error) {

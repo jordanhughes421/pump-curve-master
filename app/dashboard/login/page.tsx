@@ -33,7 +33,9 @@ const LoginPage = () => {
 
       const data = await response.json();
       if (response.ok) {
+        console.log('Login successful, user data:', data.userWithoutPassword);
         setUser(data.userWithoutPassword);
+        console.log('User state after setUser:', data.userWithoutPassword);
         router.push('/dashboard');
       } else {
         throw new Error(data.message || 'Failed to login');

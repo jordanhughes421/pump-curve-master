@@ -14,6 +14,9 @@ const Header = () => {
     // Check if user is authenticated based on user context
     const isAuthenticated = !!user;
 
+    console.log('Header - User state:', user);
+    console.log('Header - Is authenticated:', isAuthenticated);
+
     const handleLogout = async () => {
         try {
           const response = await fetch('/api/auth/logout', {
