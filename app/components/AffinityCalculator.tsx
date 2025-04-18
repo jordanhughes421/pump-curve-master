@@ -67,18 +67,21 @@ export default function AffinityCalculator({ curves, onCalculate }: AffinityCalc
   };
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow">
-      <h3 className="text-lg font-semibold mb-4">Affinity Laws Calculator</h3>
+    <div className="bg-brandColor5 rounded-xl shadow-lg p-6">
+      <h2 className="text-2xl font-bold text-brandColor1 mb-2">Affinity Laws Calculator</h2>
+      <p className="text-brandColor1 mb-6">
+        Select a curve and apply speed and diameter ratios to create a scaled performance curve.
+      </p>
       
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-brandColor1 mb-2">
             Select Curve to Scale
           </label>
           <select
             value={selectedCurveId}
             onChange={(e) => setSelectedCurveId(Number(e.target.value))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="w-full px-4 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 bg-white text-brandColor1"
           >
             {curves.map(curve => (
               <option key={curve.id} value={curve.id}>
@@ -89,7 +92,7 @@ export default function AffinityCalculator({ curves, onCalculate }: AffinityCalc
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-brandColor1 mb-2">
             Speed Ratio (N₂/N₁)
           </label>
           <input
@@ -100,12 +103,12 @@ export default function AffinityCalculator({ curves, onCalculate }: AffinityCalc
               ...prev,
               speedRatio: parseFloat(e.target.value)
             }))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="w-full px-4 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 bg-white text-brandColor1"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-brandColor1 mb-2">
             Diameter Ratio (D₂/D₁)
           </label>
           <input
@@ -116,24 +119,27 @@ export default function AffinityCalculator({ curves, onCalculate }: AffinityCalc
               ...prev,
               diameterRatio: parseFloat(e.target.value)
             }))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="w-full px-4 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 bg-white text-brandColor1"
           />
         </div>
 
         <button
           onClick={calculateScaledCurve}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="w-full px-6 py-2 bg-brandColor1 text-brandColor5 rounded-lg hover:bg-brandColor2 focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 transition-colors flex items-center justify-center gap-2"
         >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+          </svg>
           Calculate Scaled Curve
         </button>
       </div>
 
-      <div className="mt-4 text-sm text-gray-600">
-        <p>Affinity Laws:</p>
-        <ul className="list-disc pl-4 mt-2">
-          <li>Flow (Q₂/Q₁) = (N₂/N₁) × (D₂/D₁)³</li>
-          <li>Head (H₂/H₁) = (N₂/N₁)² × (D₂/D₁)²</li>
-          <li>Power (P₂/P₁) = (N₂/N₁)³ × (D₂/D₁)⁵</li>
+      <div className="mt-6 p-4 bg-white rounded-lg border border-brandColor3">
+        <h3 className="text-sm font-medium text-brandColor1 mb-2">Affinity Laws:</h3>
+        <ul className="space-y-1 text-sm text-brandColor1">
+          <li>• Flow (Q₂/Q₁) = (N₂/N₁) × (D₂/D₁)³</li>
+          <li>• Head (H₂/H₁) = (N₂/N₁)² × (D₂/D₁)²</li>
+          <li>• Power (P₂/P₁) = (N₂/N₁)³ × (D₂/D₁)⁵</li>
         </ul>
       </div>
     </div>
