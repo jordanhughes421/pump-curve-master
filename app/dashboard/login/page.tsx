@@ -9,7 +9,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string>('');
   const router = useRouter();
-  const { user, setUser, isLoading } = useUser();
+  const { user, setUser, isLoading, refreshSession } = useUser();
 
   useEffect(() => {
     // If user is already authenticated, redirect to dashboard
@@ -37,6 +37,8 @@ const LoginPage = () => {
         // Set user state before navigation
         setUser(data.userWithoutPassword);
         console.log('User state after setUser:', data.userWithoutPassword);
+        // Refresh the session to ensure all components have the latest user state
+        await refreshSession();
         // Use replace instead of push to prevent back navigation to login
         router.replace('/dashboard');
       } else {

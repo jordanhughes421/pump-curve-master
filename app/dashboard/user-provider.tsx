@@ -1,6 +1,6 @@
 // app/dashboard/layout.tsx
 'use client'
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
 
 // Define user type if needed
 type User = {
@@ -22,6 +22,7 @@ type UserContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
   isLoading: boolean;
+  refreshSession: () => Promise<void>;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -30,35 +31,42 @@ export const UserProvider: React.FC<{children: ReactNode}> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        console.log('Checking authentication...');
-        const response = await fetch('/api/auth/session');
-        const data = await response.json();
-        
-        console.log('Session check response:', data);
-        
-        if (response.ok && data.user) {
-          console.log('Setting user from session:', data.user);
-          setUser(data.user);
-        } else {
-          console.log('No valid session found');
-          setUser(null);
-        }
-      } catch (error) {
-        console.error('Error checking authentication:', error);
+  const checkAuth = useCallback(async () => {
+    try {
+      console.log('Checking authentication...');
+      const response = await fetch('/api/auth/session');
+      const data = await response.json();
+      
+      console.log('Session check response:', data);
+      
+      if (response.ok && data.user) {
+        console.log('Setting user from session:', data.user);
+        setUser(data.user);
+      } else {
+        console.log('No valid session found');
         setUser(null);
-      } finally {
-        setIsLoading(false);
       }
-    };
-
-    checkAuth();
+    } catch (error) {
+      console.error('Error checking authentication:', error);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
+  // Initial session check
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  // Expose refreshSession function to force a session check
+  const refreshSession = useCallback(async () => {
+    setIsLoading(true);
+    await checkAuth();
+  }, [checkAuth]);
+
   return (
-    <UserContext.Provider value={{ user, setUser, isLoading }}>
+    <UserContext.Provider value={{ user, setUser, isLoading, refreshSession }}>
       {children}
     </UserContext.Provider>
   );
