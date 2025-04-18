@@ -25,7 +25,7 @@ const LoginPage = () => {
         if (response.ok) {
           setUser(data.user);
           router.push('/dashboard');
-        } else {
+        } else if (response.status !== 401) {
           throw new Error(data.message || 'Failed to check session');
         }
       } catch (error: unknown) {
