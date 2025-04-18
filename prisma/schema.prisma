@@ -83,6 +83,14 @@ model PumpCurve {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   pumpModel   PumpModel @relation(fields: [pumpModelId], references: [id])
+  
+  // New fields for scaled curves
+  isScaled    Boolean   @default(false)
+  originalCurveId Int?
+  originalCurve   PumpCurve?  @relation("ScaledCurves", fields: [originalCurveId], references: [id])
+  scaledCurves    PumpCurve[] @relation("ScaledCurves")
+  speedRatio      Float?
+  diameterRatio   Float?
 }
 
 model Document {
