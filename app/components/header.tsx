@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation'
 import { useUser } from '@/app/dashboard/user-provider';
@@ -7,9 +7,9 @@ import { useUser } from '@/app/dashboard/user-provider';
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
-    const [error, setError] = useState<string>(''); // Explicitly type the error state as string
+    const [error, setError] = useState<string>('');
     const router = useRouter();
-    const { user } = useUser();
+    const { user, setUser } = useUser();
     
     // Check if user is authenticated based on user context
     const isAuthenticated = !!user;
@@ -28,19 +28,25 @@ const Header = () => {
     
           const data = await response.json();
           if (response.ok) {
+            // Clear the user state immediately
+            setUser(null);
             router.push('/');
           } else {
             throw new Error(data.message || 'Failed to check session');
           }
         } catch (error: unknown) {
-          // Check if the error is an instance of Error and set the message, else set a default error message
           if (error instanceof Error) {
             setError(error.message);
           } else {
             setError('An unexpected error occurred');
           }
         }
-      };
+    };
+
+    // Force re-render when pathname changes
+    useEffect(() => {
+        setIsOpen(false);
+    }, [pathname]);
 
     const homeLink = isAuthenticated ? '/dashboard' : '/';
     
