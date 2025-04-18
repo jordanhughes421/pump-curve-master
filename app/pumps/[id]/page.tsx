@@ -108,7 +108,7 @@ export default function PumpDetailsPage() {
     }
   };
 
-  const handleScaleCurve = async (originalCurve: PumpCurve, scaledPoints: string) => {
+  const handleScaleCurve = async (originalCurve: PumpCurve, scaledPoints: string, speedRatio: number, diameterRatio: number) => {
     try {
       const response = await fetch('/api/pump-curves/scale', {
         method: 'POST',
@@ -119,6 +119,8 @@ export default function PumpDetailsPage() {
           originalCurveId: originalCurve.id,
           pumpModelId: pump?.id,
           points: scaledPoints,
+          speedRatio,
+          diameterRatio,
         }),
       });
 
@@ -234,8 +236,8 @@ export default function PumpDetailsPage() {
               <div className="bg-white rounded-xl shadow-lg p-6">
                 <h2 className="text-2xl font-bold text-brandColor1 mb-4">Scale Curve</h2>
                 <AffinityCalculator
-                  originalCurve={curves[0]}
-                  onCalculate={(scaledPoints) => handleScaleCurve(curves[0], scaledPoints)}
+                  curves={curves}
+                  onCalculate={handleScaleCurve}
                 />
               </div>
             )}

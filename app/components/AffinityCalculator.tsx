@@ -14,8 +14,8 @@ interface PumpCurve {
 }
 
 interface AffinityCalculatorProps {
-  originalCurve: PumpCurve;
-  onCalculate: (scaledPoints: string) => void;
+  curves: PumpCurve[];
+  onCalculate: (originalCurve: PumpCurve, scaledPoints: string, speedRatio: number, diameterRatio: number) => void;
 }
 
 interface ScalingFactors {
@@ -23,15 +23,28 @@ interface ScalingFactors {
   diameterRatio: number;
 }
 
-export default function AffinityCalculator({ originalCurve, onCalculate }: AffinityCalculatorProps) {
+export default function AffinityCalculator({ curves, onCalculate }: AffinityCalculatorProps) {
+  const [selectedCurveId, setSelectedCurveId] = useState<number>(curves[0]?.id || 0);
   const [scalingFactors, setScalingFactors] = useState<ScalingFactors>({
     speedRatio: 1,
     diameterRatio: 1,
   });
 
   const calculateScaledCurve = () => {
-    const originalPoints = JSON.parse(originalCurve.points);
-    const scaledPoints = originalPoints.map((point: any) => {
+    const originalCurve = curves.find(c => c.id === selectedCurveId);
+    if (!originalCurve) return;
+
+    const originalPoints = originalCurve.points.split(';').map(point => {
+      const [flow, head, efficiency, power] = point.split(',');
+      return {
+        flow: Number(flow),
+        head: Number(head),
+        efficiency: Number(efficiency),
+        power: Number(power)
+      };
+    });
+
+    const scaledPoints = originalPoints.map(point => {
       // Apply affinity laws
       const scaledFlow = point.flow * scalingFactors.speedRatio * Math.pow(scalingFactors.diameterRatio, 3);
       const scaledHead = point.head * Math.pow(scalingFactors.speedRatio, 2) * Math.pow(scalingFactors.diameterRatio, 2);
@@ -45,7 +58,12 @@ export default function AffinityCalculator({ originalCurve, onCalculate }: Affin
       };
     });
 
-    onCalculate(JSON.stringify(scaledPoints));
+    // Convert back to the expected format: "flow,head,efficiency,power;flow,head,efficiency,power"
+    const formattedPoints = scaledPoints
+      .map(point => `${point.flow},${point.head},${point.efficiency},${point.power}`)
+      .join(';');
+
+    onCalculate(originalCurve, formattedPoints, scalingFactors.speedRatio, scalingFactors.diameterRatio);
   };
 
   return (
@@ -53,6 +71,23 @@ export default function AffinityCalculator({ originalCurve, onCalculate }: Affin
       <h3 className="text-lg font-semibold mb-4">Affinity Laws Calculator</h3>
       
       <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Select Curve to Scale
+          </label>
+          <select
+            value={selectedCurveId}
+            onChange={(e) => setSelectedCurveId(Number(e.target.value))}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
+            {curves.map(curve => (
+              <option key={curve.id} value={curve.id}>
+                {curve.speed} RPM {curve.isScaled ? '(Scaled)' : ''}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">
             Speed Ratio (N₂/N₁)
