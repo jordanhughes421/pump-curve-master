@@ -2,19 +2,17 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation'
-
-
+import { useUser } from '@/app/dashboard/user-provider';
 
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
     const [error, setError] = useState<string>(''); // Explicitly type the error state as string
     const router = useRouter();
+    const { user } = useUser();
     
-    // Check if we're on an authenticated page (dashboard or pump-related pages)
-    const isAuthenticatedPage = pathname.startsWith('/dashboard') ||
-                              pathname.startsWith('/pumps') ||
-                              pathname.startsWith('/api');
+    // Check if user is authenticated based on user context
+    const isAuthenticated = !!user;
 
     const handleLogout = async () => {
         try {
@@ -41,13 +39,13 @@ const Header = () => {
         }
       };
 
-    const homeLink = isAuthenticatedPage ? '/dashboard' : '/';
+    const homeLink = isAuthenticated ? '/dashboard' : '/';
     
     const navLinks = [
         { href: homeLink, label: 'Home' },
     ];
 
-    if (!isAuthenticatedPage) {
+    if (!isAuthenticated) {
         navLinks.push({ href: '/dashboard/login', label: 'Login' });
         navLinks.push({ href: '/dashboard/register', label: 'Register' });
     } else {
@@ -75,7 +73,7 @@ const Header = () => {
                             </Link>
                         </li>
                     ))}
-                    {isAuthenticatedPage && (
+                    {isAuthenticated && (
                         <li>
                             <button onClick={handleLogout} className="hover:text-brandColor3">Logout</button>
                         </li>

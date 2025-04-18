@@ -9,35 +9,14 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string>('');
   const router = useRouter();
-  const { user, setUser } = useUser();
+  const { user, setUser, isLoading } = useUser();
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch('/api/auth/session', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-  
-        const data = await response.json();
-        if (response.ok) {
-          setUser(data.user);
-          router.push('/dashboard');
-        } else if (response.status !== 401) {
-          throw new Error(data.message || 'Failed to check session');
-        }
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          setError(error.message);
-        } else {
-          setError('An unexpected error occurred');
-        }
-      }
-    };
-    fetchUserData();
-  }, [router, setUser]);
+    // If user is already authenticated, redirect to dashboard
+    if (user && !isLoading) {
+      router.push('/dashboard');
+    }
+  }, [user, isLoading, router]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -67,6 +46,17 @@ const LoginPage = () => {
       }
     }
   };
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-brandColor5 flex items-center justify-center p-4">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+          <p className="text-brandColor1">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-brandColor5 flex items-center justify-center p-4">
