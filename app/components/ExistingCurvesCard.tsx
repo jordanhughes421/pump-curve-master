@@ -11,8 +11,15 @@ interface CurvePoint {
 
 interface PumpCurve {
   id: number;
+  pumpModelId: number;
   speed: number;
   points: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isScaled?: boolean;
+  originalCurveId?: number;
+  speedRatio?: number;
+  diameterRatio?: number;
 }
 
 interface ExistingCurvesCardProps {
