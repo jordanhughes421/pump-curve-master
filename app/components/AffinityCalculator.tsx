@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
-import { PumpCurve } from '@prisma/client';
+
+interface PumpCurve {
+  id: number;
+  pumpModelId: number;
+  speed: number;
+  points: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isScaled?: boolean;
+  originalCurveId?: number;
+  speedRatio?: number;
+  diameterRatio?: number;
+}
 
 interface AffinityCalculatorProps {
   originalCurve: PumpCurve;
