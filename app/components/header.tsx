@@ -9,13 +9,19 @@ const Header = () => {
     const pathname = usePathname();
     const [error, setError] = useState<string>('');
     const router = useRouter();
-    const { user, setUser } = useUser();
+    const { user, setUser, refreshSession } = useUser();
     
     // Check if user is authenticated based on user context
     const isAuthenticated = !!user;
 
     console.log('Header - User state:', user);
     console.log('Header - Is authenticated:', isAuthenticated);
+
+    // Check session on mount and when pathname changes
+    useEffect(() => {
+        console.log('Header - Checking session...');
+        refreshSession();
+    }, [pathname, refreshSession]);
 
     const handleLogout = async () => {
         try {

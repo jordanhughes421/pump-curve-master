@@ -34,12 +34,15 @@ const LoginPage = () => {
       const data = await response.json();
       if (response.ok) {
         console.log('Login successful, user data:', data.userWithoutPassword);
-        // Set user state before navigation
+        
+        // First refresh the session to ensure all components have the latest user state
+        await refreshSession();
+        
+        // Then set the user state
         setUser(data.userWithoutPassword);
         console.log('User state after setUser:', data.userWithoutPassword);
-        // Refresh the session to ensure all components have the latest user state
-        await refreshSession();
-        // Use replace instead of push to prevent back navigation to login
+        
+        // Finally navigate to dashboard
         router.replace('/dashboard');
       } else {
         throw new Error(data.message || 'Failed to login');
