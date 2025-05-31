@@ -19,18 +19,7 @@ interface PumpModel {
   description: string;
 }
 
-interface PumpCurve {
-  id: number;
-  pumpModelId: number;
-  speed: number;
-  points: string;
-  createdAt: Date;
-  updatedAt: Date;
-  isScaled?: boolean;
-  originalCurveId?: number | null;
-  speedRatio?: number | null;
-  diameterRatio?: number | null;
-}
+import type { PumpCurve } from '../../../../types';
 
 export default function PumpDetailsPage() {
   const params = useParams();

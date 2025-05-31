@@ -1,19 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import type { PumpCurve } from '../../types';
 
 // Assuming PumpCurve type is defined in a shared types file, e.g., @/types/index
 // For now, let's redefine it here or import if available.
-interface PumpCurve {
-  id: number;
-  pumpModelId: number;
-  speed: number; // This is the original speed of this curve
-  points: string;
-  createdAt: Date;
-  updatedAt: Date;
-  isScaled?: boolean;
-  originalCurveId?: number | null;
-  speedRatio?: number | null;
-  diameterRatio?: number | null;
-}
 
 interface AffinityCalculatorProps {
   curves: PumpCurve[]; // Should ideally be non-scaled curves for selection

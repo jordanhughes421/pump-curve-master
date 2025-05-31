@@ -18,11 +18,7 @@ interface CurvePoint {
   power: number;
 }
 
-interface PumpCurve {
-  id: number;
-  speed: number;
-  points: string;
-}
+import type { PumpCurve } from '../../types';
 
 interface PumpCurveChartProps {
   curves: PumpCurve[];
