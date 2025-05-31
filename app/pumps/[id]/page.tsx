@@ -108,36 +108,42 @@ export default function PumpDetailsPage() {
     }
   };
 
-  const handleScaleCurve = async (originalCurve: PumpCurve, scaledPoints: string, speedRatio: number, diameterRatio: number) => {
-    try {
-      const response = await fetch('/api/pump-curves/scale', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          originalCurveId: originalCurve.id,
-          pumpModelId: pump?.id,
-          points: scaledPoints,
-          speedRatio,
-          diameterRatio,
-        }),
-      });
+  // const handleScaleCurve = async (originalCurve: PumpCurve, scaledPoints: string, speedRatio: number, diameterRatio: number) => {
+  //   try {
+  //     const response = await fetch('/api/pump-curves/scale', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         originalCurveId: originalCurve.id,
+  //         pumpModelId: pump?.id,
+  //         points: scaledPoints,
+  //         speedRatio,
+  //         diameterRatio,
+  //       }),
+  //     });
 
-      if (!response.ok) {
-        throw new Error('Failed to create scaled curve');
-      }
+  //     if (!response.ok) {
+  //       throw new Error('Failed to create scaled curve');
+  //     }
 
-      // Refresh curves after scaling
-      const curvesResponse = await fetch(`/api/pumps/${params.id}/curves`);
-      if (!curvesResponse.ok) {
-        throw new Error('Failed to fetch updated curves');
-      }
-      const curvesData = await curvesResponse.json();
-      setCurves(curvesData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create scaled curve');
-    }
+  //     // Refresh curves after scaling
+  //     const curvesResponse = await fetch(`/api/pumps/${params.id}/curves`);
+  //     if (!curvesResponse.ok) {
+  //       throw new Error('Failed to fetch updated curves');
+  //     }
+  //     const curvesData = await curvesResponse.json();
+  //     setCurves(curvesData);
+  //   } catch (err) {
+  //     setError(err instanceof Error ? err.message : 'Failed to create scaled curve');
+  //   }
+  // };
+
+  const handleNewScaledCurve = (newlyScaledCurve: PumpCurve) => {
+    setCurves(prevCurves => [...prevCurves, newlyScaledCurve]);
+    // Optionally, could add a user notification here that scaling was successful.
+    // e.g., toast.success('Curve scaled successfully!');
   };
 
   if (loading) {
@@ -232,12 +238,14 @@ export default function PumpDetailsPage() {
               onEdit={handleEditCurve}
               onDelete={handleDeleteCurve}
             />
-            {curves.length > 0 && (
+            {/* Show AffinityCalculator only if pump data is available and there's at least one original (non-scaled) curve */}
+            {pump && curves.some(c => !c.isScaled) && (
               <div className="bg-white rounded-xl shadow-lg p-6">
                 <h2 className="text-2xl font-bold text-brandColor1 mb-4">Scale Curve</h2>
                 <AffinityCalculator
-                  curves={curves}
-                  onCalculate={handleScaleCurve}
+                  curves={curves} // Pass all curves; AffinityCalculator filters internally for selection
+                  pumpModelId={pump.id}
+                  onScaledCurveCreated={handleNewScaledCurve}
                 />
               </div>
             )}
