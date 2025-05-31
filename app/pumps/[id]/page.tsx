@@ -19,7 +19,7 @@ interface PumpModel {
   description: string;
 }
 
-import type { PumpCurve } from '../../../../types';
+import type { PumpCurve } from '../../../types';
 
 export default function PumpDetailsPage() {
   const params = useParams();
