@@ -27,9 +27,9 @@ interface PumpCurve {
   createdAt: Date;
   updatedAt: Date;
   isScaled?: boolean;
-  originalCurveId?: number;
-  speedRatio?: number;
-  diameterRatio?: number;
+  originalCurveId?: number | null;
+  speedRatio?: number | null;
+  diameterRatio?: number | null;
 }
 
 export default function PumpDetailsPage() {
