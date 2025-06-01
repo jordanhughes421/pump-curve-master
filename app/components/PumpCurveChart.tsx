@@ -91,21 +91,17 @@ export default function PumpCurveChart({ curves }: PumpCurveChartProps) {
   const labels = Array.from(new Set(filteredCurves.flatMap(curve => curve.points.map(p => p.flow)))).sort((a, b) => a - b);
 
   const datasets = filteredCurves.flatMap((curve, index) => {
-    const colorSet = [ // Modern color palette
-      // Ensure enough colors if many curves can be displayed simultaneously, or use a color generation function.
-      { head: 'rgba(54, 162, 235, 1)', efficiency: 'rgba(75, 192, 192, 1)' }, // Blue, Teal
-      { head: 'rgba(255, 99, 132, 1)', efficiency: 'rgba(255, 159, 64, 1)' }, // Pink, Orange
-      { head: 'rgba(153, 102, 255, 1)', efficiency: 'rgba(255, 205, 86, 1)' }, // Purple, Yellow
-      { head: 'rgba(60, 179, 113, 1)', efficiency: 'rgba(238, 130, 238, 1)' }, // MediumSeaGreen, Violet
-    ];
-    const selectedColors = colorSet[index % colorSet.length];
+    // New color scheme
+    const headColor = '#3B82F6'; // Blue
+    const efficiencyColor = '#10B981'; // Emerald/Green
+
     const isScaledCurve = !!curve.isScaled; // Treat undefined as false
 
     const headDataset: any = {
       label: `${curve.speed} RPM - Head` + (isScaledCurve ? ' (Scaled)' : ''),
       data: curve.points.map(p => ({ x: p.flow, y: p.head })),
-      borderColor: selectedColors.head,
-      backgroundColor: selectedColors.head.replace('1)', '0.5)'),
+      borderColor: headColor,
+      backgroundColor: 'rgba(59, 130, 246, 0.5)', // Lighter blue for fill if used
       yAxisID: 'yHead',
       tension: 0.4,
       pointRadius: 3,
@@ -116,8 +112,8 @@ export default function PumpCurveChart({ curves }: PumpCurveChartProps) {
     const efficiencyDataset: any = {
       label: `${curve.speed} RPM - Efficiency` + (isScaledCurve ? ' (Scaled)' : ''),
       data: curve.points.map(p => ({ x: p.flow, y: p.efficiency })),
-      borderColor: selectedColors.efficiency,
-      backgroundColor: selectedColors.efficiency.replace('1)', '0.5)'),
+      borderColor: efficiencyColor,
+      backgroundColor: 'rgba(16, 185, 129, 0.5)', // Lighter emerald/green for fill if used
       yAxisID: 'yEfficiency',
       tension: 0.4,
       pointRadius: 3,
