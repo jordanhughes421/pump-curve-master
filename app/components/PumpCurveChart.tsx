@@ -13,22 +13,18 @@ import {
   Legend,
   Filler, // Added for potential gradient fills if desired for modern look
 } from 'chart.js';
-import AnnotationPlugin from 'chartjs-plugin-annotation';
+// Removed AnnotationPlugin import
 import type { PumpCurve } from '../../types';
 
 // Define a type for individual curve points, consistent with parsed data
-interface CurvePoint {
+interface CurvePoint { // This interface is still used by ProcessedPumpCurve and parsing logic
   flow: number;
   head: number;
   efficiency: number;
   power: number;
 }
 
-// Define a type for storing BEP data along with curve min/max flow
-interface BepData extends CurvePoint {
-  curveMinFlow: number;
-  curveMaxFlow: number;
-}
+// BepData interface removed
 
 // Define a type for the processed curve, where points is an array of CurvePoint
 interface ProcessedPumpCurve extends Omit<PumpCurve, 'points'> {
@@ -44,8 +40,8 @@ Chart.register(
   Title,
   Tooltip,
   Legend,
-  Filler,
-  AnnotationPlugin
+  Filler
+  // AnnotationPlugin removed from registration
 );
 
 interface PumpCurveChartProps {
@@ -56,9 +52,7 @@ export default function PumpCurveChart({ curves }: PumpCurveChartProps) {
   const [showOriginalCurves, setShowOriginalCurves] = useState(true);
   const [showScaledCurves, setShowScaledCurves] = useState(true);
   const [selectedSpeeds, setSelectedSpeeds] = useState<number[]>([]);
-  const [bepPoint, setBepPoint] = useState<BepData | null>(null); // Updated type
-  const [porRange, setPorRange] = useState<{ minFlow: number, maxFlow: number } | null>(null);
-  const [aorRange, setAorRange] = useState<{ minFlow: number, maxFlow: number } | null>(null);
+  // bepPoint, porRange, aorRange states removed
 
   // Get unique speeds from curves for filter options
   const uniqueSpeeds = Array.from(new Set(curves.map(curve => curve.speed))).sort((a, b) => a - b);
@@ -72,6 +66,8 @@ export default function PumpCurveChart({ curves }: PumpCurveChartProps) {
   // with useMemo and also defined at the top level if they don't depend on other
   // variables that are only available after the early return.
   // For now, this direct move should satisfy the Rules of Hooks.
+
+  // BEP and POR/AOR useEffect hooks removed.
 
   let parsedCurves: ProcessedPumpCurve[] = [];
   if (curves && curves.length > 0) {
@@ -98,65 +94,7 @@ export default function PumpCurveChart({ curves }: PumpCurveChartProps) {
     return typeMatch && speedMatch;
   });
 
-  useEffect(() => {
-    if (filteredCurves.length === 1) {
-      const singleCurve = filteredCurves[0];
-      if (singleCurve.points && singleCurve.points.length > 0) {
-        const calculatedBep = singleCurve.points.reduce((bep, currentPoint) => {
-          return currentPoint.efficiency > bep.efficiency ? currentPoint : bep;
-        }, singleCurve.points[0]);
-
-        const flowValues = singleCurve.points.map(p => p.flow);
-        const curveMinFlow = Math.min(...flowValues);
-        const curveMaxFlow = Math.max(...flowValues);
-
-        setBepPoint({
-          ...calculatedBep,
-          curveMinFlow,
-          curveMaxFlow,
-        });
-      } else {
-        setBepPoint(null);
-      }
-    } else {
-      setBepPoint(null);
-    }
-  }, [filteredCurves, showOriginalCurves, showScaledCurves, selectedSpeeds]); // Added all state dependencies that influence filteredCurves
-
-  // Calculate POR and AOR ranges when bepPoint changes
-  useEffect(() => {
-    if (bepPoint) {
-      // Initial calculations based on BEP flow percentage
-      const initialPorMin = bepPoint.flow * 0.70;
-      const initialPorMax = bepPoint.flow * 1.20;
-      const initialAorMin = bepPoint.flow * 0.50;
-      const initialAorMax = bepPoint.flow * 1.30;
-
-      // Constrain by actual curve flow range
-      const finalPorMin = Math.max(initialPorMin, bepPoint.curveMinFlow);
-      const finalPorMax = Math.min(initialPorMax, bepPoint.curveMaxFlow);
-      const finalAorMin = Math.max(initialAorMin, bepPoint.curveMinFlow);
-      const finalAorMax = Math.min(initialAorMax, bepPoint.curveMaxFlow);
-
-      // Set ranges only if valid (min < max)
-      if (finalPorMin < finalPorMax) {
-        setPorRange({ minFlow: finalPorMin, maxFlow: finalPorMax });
-      } else {
-        setPorRange(null);
-      }
-
-      if (finalAorMin < finalAorMax) {
-        setAorRange({ minFlow: finalAorMin, maxFlow: finalAorMax });
-      } else {
-        setAorRange(null);
-      }
-
-    } else {
-      setPorRange(null);
-      setAorRange(null);
-    }
-  }, [bepPoint]);
-  // --- END OF MOVED HOOKS ---
+  // --- END OF MOVED HOOKS --- (Adjusted comment, hooks were here)
 
   const handleSpeedChange = (speed: number) => {
     setSelectedSpeeds(prevSpeeds =>
@@ -254,90 +192,7 @@ export default function PumpCurveChart({ curves }: PumpCurveChartProps) {
   const allHeadPoints = filteredCurves.flatMap(c => c.points.map(p => p.head)); // Will be empty if no visible points
   const maxHead = allHeadPoints.length > 0 ? Math.max(...allHeadPoints, 0) : 0; // Default to 0 if no points
 
-
-  // Dynamically build annotations
-  const dynamicAnnotations: Record<string, any> = {};
-  let porIsValid = false;
-
-  if (bepPoint) {
-    // BEP Line
-    dynamicAnnotations.bepLine = {
-      type: 'line' as const,
-      xMin: bepPoint.flow,
-      xMax: bepPoint.flow,
-      borderColor: 'rgba(0, 0, 0, 0.8)',
-      borderWidth: 2,
-      label: {
-        content: 'BEP',
-        enabled: true,
-        position: 'start' as const,
-        backgroundColor: 'rgba(0,0,0,0.7)',
-        color: 'white',
-        font: { style: 'bold' as const },
-        padding: { x: 4, y: 2 },
-        borderRadius: 3,
-      },
-    };
-
-    // POR Zone
-    if (porRange && porRange.minFlow < porRange.maxFlow) {
-      porIsValid = true;
-      dynamicAnnotations.porBox = {
-        type: 'box' as const,
-        xMin: porRange.minFlow,
-        xMax: porRange.maxFlow,
-        backgroundColor: 'rgba(16, 185, 129, 0.15)',
-        borderColor: 'rgba(16, 185, 129, 0.0)',
-        label: {
-          content: 'POR',
-          enabled: true,
-          position: 'center' as const,
-          color: 'rgba(16, 185, 129, 0.7)',
-          font: { style: 'bold' as const, size: 10 },
-          padding: { x: 4, y: 2 },
-        },
-      };
-    }
-
-    // AOR Zones
-    if (aorRange && aorRange.minFlow < aorRange.maxFlow) {
-      const aorMin = aorRange.minFlow;
-      const aorMax = aorRange.maxFlow;
-
-      // AOR Left Segment
-      const leftAnchor = porIsValid && porRange ? porRange.minFlow : bepPoint.flow;
-      if (aorMin < leftAnchor) {
-        dynamicAnnotations.aorLeftBox = {
-          type: 'box' as const,
-          xMin: aorMin,
-          xMax: leftAnchor,
-          backgroundColor: 'rgba(245, 158, 11, 0.15)',
-          borderColor: 'rgba(245, 158, 11, 0.0)',
-          label: { // Label only for the first AOR segment or if POR is not valid
-            content: 'AOR',
-            enabled: true,
-            position: 'center' as const,
-            color: 'rgba(245, 158, 11, 0.7)',
-            font: { style: 'bold' as const, size: 10 },
-            padding: { x: 4, y: 2 },
-          },
-        };
-      }
-
-      // AOR Right Segment
-      const rightAnchor = porIsValid && porRange ? porRange.maxFlow : bepPoint.flow;
-      if (aorMax > rightAnchor) {
-        dynamicAnnotations.aorRightBox = {
-          type: 'box' as const,
-          xMin: rightAnchor,
-          xMax: aorMax,
-          backgroundColor: 'rgba(245, 158, 11, 0.15)',
-          borderColor: 'rgba(245, 158, 11, 0.0)',
-          // Optionally, add a label here if needed, or adjust left AOR label logic
-        };
-      }
-    }
-  }
+  // Annotation logic (dynamicAnnotations, etc.) removed.
 
   const options = {
     responsive: true,
@@ -394,9 +249,7 @@ export default function PumpCurveChart({ curves }: PumpCurveChartProps) {
           }
         },
       },
-      annotation: {
-        annotations: dynamicAnnotations, // Use the new dynamicAnnotations object
-      }
+      // annotation plugin configuration removed
     },
     scales: {
       x: {
