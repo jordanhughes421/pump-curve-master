@@ -152,7 +152,8 @@ export default function PumpCurveChart({ curves }: PumpCurveChartProps) {
     responsive: true,
     maintainAspectRatio: false,
     interaction: {
-      mode: 'index' as const,
+      mode: 'nearest' as const,
+      axis: 'x' as const,
       intersect: false,
     },
     stacked: false,
