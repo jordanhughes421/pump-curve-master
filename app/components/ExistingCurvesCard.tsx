@@ -9,18 +9,7 @@ interface CurvePoint {
   power: number;
 }
 
-interface PumpCurve {
-  id: number;
-  pumpModelId: number;
-  speed: number;
-  points: string;
-  createdAt: Date;
-  updatedAt: Date;
-  isScaled?: boolean;
-  originalCurveId?: number;
-  speedRatio?: number;
-  diameterRatio?: number;
-}
+import type { PumpCurve } from '../../types';
 
 interface ExistingCurvesCardProps {
   curves: PumpCurve[];
