@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart,
@@ -13,7 +13,21 @@ import {
   Legend,
   Filler, // Added for potential gradient fills if desired for modern look
 } from 'chart.js';
+import AnnotationPlugin from 'chartjs-plugin-annotation';
 import type { PumpCurve } from '../../types';
+
+// Define a type for individual curve points, consistent with parsed data
+interface CurvePoint {
+  flow: number;
+  head: number;
+  efficiency: number;
+  power: number;
+}
+
+// Define a type for the processed curve, where points is an array of CurvePoint
+interface ProcessedPumpCurve extends Omit<PumpCurve, 'points'> {
+  points: CurvePoint[];
+}
 
 // Register Chart.js components
 Chart.register(
@@ -24,7 +38,8 @@ Chart.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  AnnotationPlugin
 );
 
 interface PumpCurveChartProps {
@@ -35,9 +50,80 @@ export default function PumpCurveChart({ curves }: PumpCurveChartProps) {
   const [showOriginalCurves, setShowOriginalCurves] = useState(true);
   const [showScaledCurves, setShowScaledCurves] = useState(true);
   const [selectedSpeeds, setSelectedSpeeds] = useState<number[]>([]);
+  const [bepPoint, setBepPoint] = useState<CurvePoint | null>(null);
+  const [porRange, setPorRange] = useState<{ minFlow: number, maxFlow: number } | null>(null);
+  const [aorRange, setAorRange] = useState<{ minFlow: number, maxFlow: number } | null>(null);
 
   // Get unique speeds from curves for filter options
   const uniqueSpeeds = Array.from(new Set(curves.map(curve => curve.speed))).sort((a, b) => a - b);
+
+  // --- START OF MOVED HOOKS ---
+  // Calculate BEP when filteredCurves (derived below, but declaration is hoisted) changes
+  // Note: `parsedCurves` and `filteredCurves` are defined further down.
+  // This is okay because the actual execution of this effect's callback
+  // happens after the initial render, by which time all variables are defined.
+  // However, for cleaner code, `parsedCurves` and `filteredCurves` could be memoized
+  // with useMemo and also defined at the top level if they don't depend on other
+  // variables that are only available after the early return.
+  // For now, this direct move should satisfy the Rules of Hooks.
+
+  let parsedCurves: ProcessedPumpCurve[] = [];
+  if (curves && curves.length > 0) {
+    parsedCurves = curves.map((curve: PumpCurve) => { // Explicitly type 'curve' here
+      const parsedPoints: CurvePoint[] = curve.points.split(';').map(point => {
+        const [flow, head, efficiency, power] = point.split(',');
+        return {
+          flow: Number(flow),
+          head: Number(head),
+          efficiency: Number(efficiency),
+          power: Number(power)
+        };
+      }).sort((a, b) => a.flow - b.flow);
+      return { ...curve, points: parsedPoints } as ProcessedPumpCurve; // Cast to ProcessedPumpCurve
+    });
+  }
+
+  // Filter curves based on UI selections
+  // This definition also needs to be available for the useEffect below.
+  const filteredCurves: ProcessedPumpCurve[] = parsedCurves.filter(curve => { // Add type to filteredCurves
+    const isScaledCurve = !!curve.isScaled;
+    const typeMatch = (isScaledCurve && showScaledCurves) || (!isScaledCurve && showOriginalCurves);
+    const speedMatch = selectedSpeeds.length === 0 || selectedSpeeds.includes(curve.speed);
+    return typeMatch && speedMatch;
+  });
+
+  useEffect(() => {
+    if (filteredCurves.length === 1) {
+      const singleCurve = filteredCurves[0];
+      if (singleCurve.points && singleCurve.points.length > 0) {
+        const calculatedBep = singleCurve.points.reduce((bep, currentPoint) => {
+          return currentPoint.efficiency > bep.efficiency ? currentPoint : bep;
+        }, singleCurve.points[0]);
+        setBepPoint(calculatedBep);
+      } else {
+        setBepPoint(null);
+      }
+    } else {
+      setBepPoint(null);
+    }
+  }, [filteredCurves, showOriginalCurves, showScaledCurves, selectedSpeeds]); // Added all state dependencies that influence filteredCurves
+
+  // Calculate POR and AOR ranges when bepPoint changes
+  useEffect(() => {
+    if (bepPoint) {
+      const porMinFlow = 0.70 * bepPoint.flow;
+      const porMaxFlow = 1.20 * bepPoint.flow;
+      setPorRange({ minFlow: porMinFlow, maxFlow: porMaxFlow });
+
+      const aorMinFlow = 0.50 * bepPoint.flow;
+      const aorMaxFlow = 1.30 * bepPoint.flow;
+      setAorRange({ minFlow: aorMinFlow, maxFlow: aorMaxFlow });
+    } else {
+      setPorRange(null);
+      setAorRange(null);
+    }
+  }, [bepPoint]);
+  // --- END OF MOVED HOOKS ---
 
   const handleSpeedChange = (speed: number) => {
     setSelectedSpeeds(prevSpeeds =>
@@ -57,6 +143,8 @@ export default function PumpCurveChart({ curves }: PumpCurveChartProps) {
 
 
   if (!curves || curves.length === 0) {
+    // Note: `parsedCurves` and `filteredCurves` will be empty arrays if this condition is met,
+    // because of their new definitions above. Hooks are already called.
     return (
       <div className="bg-brandColor5 border border-brandColor3 text-brandColor2 px-4 py-3 rounded-lg">
         No curve data available
@@ -64,29 +152,19 @@ export default function PumpCurveChart({ curves }: PumpCurveChartProps) {
     );
   }
 
-  const parsedCurves = curves.map(curve => {
-    const parsedPoints = curve.points.split(';').map(point => {
-      const [flow, head, efficiency, power] = point.split(',');
-      return {
-        flow: Number(flow),
-        head: Number(head),
-        efficiency: Number(efficiency),
-        power: Number(power)
-      };
-    }).sort((a, b) => a.flow - b.flow);
-    return { ...curve, points: parsedPoints };
-  });
+  // `parsedCurves` and `filteredCurves` are now defined before the hooks, near the top.
+  // The actual mapping and filtering logic is executed there.
 
-  // Filter curves based on UI selections
-  const filteredCurves = parsedCurves.filter(curve => {
-    const isScaledCurve = !!curve.isScaled;
-    const typeMatch = (isScaledCurve && showScaledCurves) || (!isScaledCurve && showOriginalCurves);
+  // TODO: console.log bepPoint to verify in development - remove for production
+  // useEffect(() => {
+  //   console.log("Current BEP Point:", bepPoint);
+  // }, [bepPoint]);
 
-    // If selectedSpeeds is empty, it means "All speeds" are effectively selected for this part of the filter
-    const speedMatch = selectedSpeeds.length === 0 || selectedSpeeds.includes(curve.speed);
-
-    return typeMatch && speedMatch;
-  });
+  // TODO: console.log POR/AOR ranges to verify - remove for production
+  // useEffect(() => {
+  //   console.log("POR Range:", porRange);
+  //   console.log("AOR Range:", aorRange);
+  // }, [porRange, aorRange]);
 
   const labels = Array.from(new Set(filteredCurves.flatMap(curve => curve.points.map(p => p.flow)))).sort((a, b) => a - b);
 
@@ -144,6 +222,74 @@ export default function PumpCurveChart({ curves }: PumpCurveChartProps) {
   const maxHead = allHeadPoints.length > 0 ? Math.max(...allHeadPoints, 0) : 0; // Default to 0 if no points
 
 
+  const annotations: any = {};
+  if (bepPoint && porRange && aorRange) {
+    annotations.line1 = { // BEP Line
+      type: 'line' as const,
+      xMin: bepPoint.flow,
+      xMax: bepPoint.flow,
+      borderColor: 'rgba(0, 0, 0, 0.8)', // Dark, distinct
+      borderWidth: 2,
+      label: {
+        content: 'BEP',
+        enabled: true,
+        position: 'start' as const,
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        color: 'white',
+        font: { style: 'bold' },
+        padding: { x: 4, y: 2},
+        borderRadius: 3,
+      },
+    };
+    annotations.box1 = { // POR Zone
+      type: 'box' as const,
+      xMin: porRange.minFlow,
+      xMax: porRange.maxFlow,
+      backgroundColor: 'rgba(16, 185, 129, 0.15)', // Light green from efficiency curves
+      borderColor: 'rgba(16, 185, 129, 0.0)', // Transparent border
+      label: {
+        content: 'POR',
+        enabled: true,
+        position: 'center' as const,
+        color: 'rgba(16, 185, 129, 0.7)',
+        font: { style: 'bold', size: 10 },
+        padding: { x: 4, y: 2},
+
+      },
+    };
+    annotations.box2 = { // AOR Zone (Left of POR)
+      type: 'box' as const,
+      xMin: aorRange.minFlow,
+      xMax: porRange.minFlow, // Up to the start of POR
+      backgroundColor: 'rgba(245, 158, 11, 0.15)', // Light orange/amber
+      borderColor: 'rgba(245, 158, 11, 0.0)',
+      label: {
+        content: 'AOR',
+        enabled: true,
+        position: 'center' as const,
+        color: 'rgba(245, 158, 11, 0.7)',
+        font: { style: 'bold', size: 10 },
+        padding: { x: 4, y: 2},
+      },
+    };
+    annotations.box3 = { // AOR Zone (Right of POR)
+      type: 'box' as const,
+      xMin: porRange.maxFlow, // From the end of POR
+      xMax: aorRange.maxFlow,
+      backgroundColor: 'rgba(245, 158, 11, 0.15)', // Light orange/amber
+      borderColor: 'rgba(245, 158, 11, 0.0)',
+      // No label for the second AOR part to avoid clutter, or make it conditional
+      // label: {
+      //   content: 'AOR',
+      //   enabled: true,
+      //   position: 'center' as const,
+      //   color: 'rgba(245, 158, 11, 0.7)',
+      //   font: { style: 'bold', size: 10 }
+      // },
+    };
+  }
+
+
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -197,8 +343,11 @@ export default function PumpCurveChart({ curves }: PumpCurveChartProps) {
             }
             return '';
           }
-        }
+        },
       },
+      annotation: {
+        annotations: annotations,
+      }
     },
     scales: {
       x: {
