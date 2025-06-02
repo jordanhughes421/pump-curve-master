@@ -137,13 +137,13 @@ export default function PumpDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-brandColor5 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <svg className="animate-spin h-12 w-12 text-brandColor1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="bg-content-background p-8 rounded-lg shadow-md flex flex-col items-center gap-4">
+          <svg className="animate-spin h-12 w-12 text-foreground/80" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          <p className="text-brandColor1 font-medium">Loading pump details...</p>
+          <p className="text-foreground/80 font-medium">Loading pump details...</p>
         </div>
       </div>
     );
@@ -151,8 +151,8 @@ export default function PumpDetailsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-brandColor5 flex items-center justify-center">
-        <div className="bg-red-50 border border-red-200 text-red-600 px-6 py-4 rounded-lg max-w-md text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-600 dark:text-red-300 px-6 py-4 rounded-lg max-w-md text-center shadow-lg">
           <h2 className="text-xl font-bold mb-2">Error Loading Pump Details</h2>
           <p>{error}</p>
         </div>
@@ -162,8 +162,8 @@ export default function PumpDetailsPage() {
 
   if (!pump) {
     return (
-      <div className="min-h-screen bg-brandColor5 flex items-center justify-center">
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-600 px-6 py-4 rounded-lg max-w-md text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 text-yellow-600 dark:text-yellow-300 px-6 py-4 rounded-lg max-w-md text-center shadow-lg">
           <h2 className="text-xl font-bold mb-2">Pump Not Found</h2>
           <p>The requested pump could not be found.</p>
         </div>
@@ -172,44 +172,44 @@ export default function PumpDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-brandColor5 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-brandColor1 mb-2">{pump.name}</h1>
-          <p className="text-brandColor1">{pump.description}</p>
+    <div className="min-h-screen bg-background py-8">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 bg-content-background rounded-xl shadow-lg">
+        <div className="mb-8 pb-6 border-b border-brandColor2">
+          <h1 className="text-4xl font-bold text-foreground mb-2">{pump.name}</h1>
+          <p className="text-lg text-foreground/80">{pump.description}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Pump Specifications */}
           <div className="space-y-8">
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-brandColor1 mb-4">Pump Specifications</h2>
+            <div className="bg-background rounded-xl shadow-md p-4 sm:p-6 border border-brandColor1/50">
+              <h2 className="text-xl font-semibold text-foreground/90 mb-6">Pump Specifications</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-sm font-medium text-brandColor1 mb-1">Flow Rate</h3>
-                  <p className="text-lg font-semibold text-brandColor1">{pump.maxFlow} GPM</p>
+                  <h3 className="text-xs font-medium text-foreground/70 mb-0.5 uppercase tracking-wider">Flow Rate</h3>
+                  <p className="text-base font-medium text-foreground">{pump.maxFlow} GPM</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-brandColor1 mb-1">Head</h3>
-                  <p className="text-lg font-semibold text-brandColor1">{pump.maxHead} ft</p>
+                  <h3 className="text-xs font-medium text-foreground/70 mb-0.5 uppercase tracking-wider">Head</h3>
+                  <p className="text-base font-medium text-foreground">{pump.maxHead} ft</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-brandColor1 mb-1">Power</h3>
-                  <p className="text-lg font-semibold text-brandColor1">{pump.maxSpeed} RPM</p>
+                  <h3 className="text-xs font-medium text-foreground/70 mb-0.5 uppercase tracking-wider">Power</h3>
+                  <p className="text-base font-medium text-foreground">{pump.maxSpeed} RPM</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-brandColor1 mb-1">Efficiency</h3>
-                  <p className="text-lg font-semibold text-brandColor1">{pump.type.replace('_', ' ')}</p>
+                  <h3 className="text-xs font-medium text-foreground/70 mb-0.5 uppercase tracking-wider">Efficiency</h3>
+                  <p className="text-base font-medium text-foreground">{pump.type.replace('_', ' ')}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-brandColor1 mb-1">NPSH</h3>
-                  <p className="text-lg font-semibold text-brandColor1">{pump.manufacturer} - {pump.modelNumber}</p>
+                  <h3 className="text-xs font-medium text-foreground/70 mb-0.5 uppercase tracking-wider">NPSH</h3>
+                  <p className="text-base font-medium text-foreground">{pump.manufacturer} - {pump.modelNumber}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-brandColor1 mb-4">Performance Curves</h2>
+            <div className="bg-background rounded-xl shadow-md p-4 sm:p-6 border border-brandColor1/50">
+              <h2 className="text-xl font-semibold text-foreground/90 mb-4">Performance Curves</h2>
               <PumpCurveChart curves={curves} />
             </div>
           </div>
@@ -229,8 +229,8 @@ export default function PumpDetailsPage() {
             />
             {/* Show AffinityCalculator only if pump data is available and there's at least one original (non-scaled) curve */}
             {pump && curves.some(c => !c.isScaled) && (
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <h2 className="text-2xl font-bold text-brandColor1 mb-4">Scale Curve</h2>
+              <div className="bg-background rounded-xl shadow-md p-4 sm:p-6 border border-brandColor1/50">
+                <h2 className="text-xl font-semibold text-foreground/90 mb-4">Scale Curve</h2>
                 <AffinityCalculator
                   curves={curves} // Pass all curves; AffinityCalculator filters internally for selection
                   pumpModelId={pump.id}

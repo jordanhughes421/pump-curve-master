@@ -52,30 +52,46 @@ const RegisterPage = () => {
     }
   };
 
+import Link from 'next/link'; // Added Link import
+
   // Show loading state while checking authentication
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-brandColor5 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
-          <p className="text-brandColor1">Loading...</p>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full bg-content-background p-8 rounded-xl shadow-xl text-center">
+          <svg className="animate-spin h-8 w-8 text-foreground/80 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p className="text-foreground/80 font-medium">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-brandColor5 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold text-brandColor1 mb-6">Register</h1>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full bg-content-background p-6 sm:p-8 rounded-xl shadow-xl space-y-8 border border-brandColor1/20">
+        <div>
+          <h1 className="text-center text-3xl font-bold tracking-tight text-foreground mb-1">
+            Create your account
+          </h1>
+          <p className="text-center text-sm">
+            Or{' '}
+            <Link href="/dashboard/login" className="text-brandColor3 hover:text-brandColor4 dark:text-brandColor4 dark:hover:text-brandColor3 transition-colors font-medium">
+              sign in to your existing account
+            </Link>
+          </p>
+        </div>
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4">
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm">
             {error}
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-brandColor1 mb-1">
-              Email
+            <label htmlFor="email" className="block text-sm font-medium text-foreground/80 mb-1">
+              Email address
             </label>
             <input
               type="email"
@@ -83,12 +99,12 @@ const RegisterPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-brandColor3 rounded-lg focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 transition-colors bg-white text-brandColor1"
-              placeholder="Enter your email"
+              className="w-full px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm"
+              placeholder="you@example.com"
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-brandColor1 mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-foreground/80 mb-1">
               Password
             </label>
             <input
@@ -97,12 +113,12 @@ const RegisterPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-brandColor3 rounded-lg focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 transition-colors bg-white text-brandColor1"
-              placeholder="Enter your password"
+              className="w-full px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm"
+              placeholder="••••••••"
             />
           </div>
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-brandColor1 mb-1">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground/80 mb-1">
               Confirm Password
             </label>
             <input
@@ -111,15 +127,15 @@ const RegisterPage = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-brandColor3 rounded-lg focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 transition-colors bg-white text-brandColor1"
-              placeholder="Confirm your password"
+              className="w-full px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm"
+              placeholder="••••••••"
             />
           </div>
-          <button 
+          <button
             type="submit"
-            className="w-full px-6 py-2 bg-brandColor1 text-brandColor5 rounded-lg hover:bg-brandColor2 focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 transition-colors"
+            className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brandColor3 hover:bg-brandColor4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandColor3 dark:focus:ring-offset-background transition-colors disabled:opacity-60"
           >
-            Register
+            Create Account
           </button>
         </form>
       </div>

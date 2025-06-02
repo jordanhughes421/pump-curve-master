@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 const Footer = () => {
     return (
-        <footer className="bg-brandColor1 text-brandColor5 p-4 mt-8">
+        <footer className="bg-content-background text-brandColor5 p-4 mt-8 border-t border-brandColor2">
             <div className="container mx-auto flex justify-between items-center flex-wrap">
                 <p className="text-sm w-full md:w-auto mb-4 md:mb-0 text-center md:text-left">
                     &copy; {new Date().getFullYear()} Jordan Hughes

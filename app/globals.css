@@ -10,6 +10,10 @@
     --color-text-light: #121212;
     --color-text-dark: #ffffff;
 
+    /* Content background colors */
+    --color-content-background-light: #f9fafb; /* Slightly off-white for light theme */
+    --color-content-background-dark: #1f2937;  /* Slightly off-black/dark blue-gray for dark theme */
+
     /* Brand colors for light theme */
     --brandColor1-light: #e0e0e0; /* Light Gray */
     --brandColor2-light: #c0c0c0; /* Silver */
@@ -27,6 +31,7 @@
     /* Default variable values (needed for Tailwind to work properly) */
     --color-background: var(--color-background-light);
     --color-text: var(--color-text-light);
+    --color-content-background: var(--color-content-background-light);
     --brandColor1: var(--brandColor1-light);
     --brandColor2: var(--brandColor2-light);
     --brandColor3: var(--brandColor3-light);
@@ -39,6 +44,7 @@
     :root {
       --color-background: var(--color-background-light);
       --color-text: var(--color-text-light);
+      --color-content-background: var(--color-content-background-light);
 
       /* Light theme brand colors */
       --brandColor1: var(--brandColor1-light);
@@ -53,6 +59,7 @@
     :root {
       --color-background: var(--color-background-dark);
       --color-text: var(--color-text-dark);
+      --color-content-background: var(--color-content-background-dark);
 
       /* Dark theme brand colors (inverses) */
       --brandColor1: var(--brandColor1-dark);

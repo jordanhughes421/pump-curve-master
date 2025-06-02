@@ -97,22 +97,17 @@ export default function AffinityCalculator({ curves, pumpModelId, onScaledCurveC
 
 
   return (
-    <div className="bg-brandColor5 rounded-xl shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-brandColor1 mb-2">Affinity Laws Calculator</h2>
-      <p className="text-brandColor1 mb-6">
-        Select an original curve, enter a new speed and diameter ratio to generate a scaled performance curve.
-      </p>
-      
+    <>
       {error && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">
-          <p>Error: {error}</p>
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm mb-4">
+          <p>{error}</p> {/* Simplified error display */}
         </div>
       )}
 
-      <div className="space-y-6">
+      <div className="space-y-4"> {/* Adjusted from space-y-6 to space-y-4 for tighter packing */}
         <div>
-          <label htmlFor="selectedCurve" className="block text-sm font-medium text-brandColor1 mb-2">
-            Select Original Curve to Scale
+          <label htmlFor="selectedCurve" className="block text-sm font-medium text-foreground/80 mb-1">
+            Select Original Curve
           </label>
           <select
             id="selectedCurve"
@@ -121,28 +116,28 @@ export default function AffinityCalculator({ curves, pumpModelId, onScaledCurveC
               const curveId = Number(e.target.value);
               setSelectedCurveId(curveId);
               const curve = curves.find(c => c.id === curveId);
-              if (curve) setNewSpeed(curve.speed); // Initialize newSpeed with selected curve's speed
+              if (curve) setNewSpeed(curve.speed);
             }}
-            className="w-full px-4 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 bg-white text-brandColor1"
+            className="w-full px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground text-sm"
             disabled={selectableCurves.length === 0}
           >
             <option value="" disabled>-- Select a curve --</option>
             {selectableCurves.map(curve => (
               <option key={curve.id} value={curve.id}>
-                {curve.speed} RPM (ID: {curve.id})
+                {curve.speed} RPM (ID: {curve.id}) {curve.isScaled ? "(Scaled - not recommended)" : ""}
               </option>
             ))}
           </select>
            {selectableCurves.length === 0 && curves.length > 0 && (
-            <p className="text-sm text-yellow-600 mt-1">Only non-scaled curves can be used as a base for scaling.</p>
+            <p className="text-xs text-yellow-500 dark:text-yellow-400 mt-1.5">Only non-scaled curves are recommended as a base for scaling.</p>
           )}
            {curves.length === 0 && (
-            <p className="text-sm text-yellow-600 mt-1">No curves available for scaling.</p>
+            <p className="text-xs text-yellow-500 dark:text-yellow-400 mt-1.5">No curves available for scaling.</p>
           )}
         </div>
 
         <div>
-          <label htmlFor="newSpeed" className="block text-sm font-medium text-brandColor1 mb-2">
+          <label htmlFor="newSpeed" className="block text-sm font-medium text-foreground/80 mb-1">
             New Speed (RPM)
           </label>
           <input
@@ -151,14 +146,14 @@ export default function AffinityCalculator({ curves, pumpModelId, onScaledCurveC
             step="50"
             value={newSpeed}
             onChange={(e) => setNewSpeed(parseFloat(e.target.value))}
-            className="w-full px-4 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 bg-white text-brandColor1"
+            className="w-full px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm"
             placeholder="e.g., 1750"
           />
         </div>
 
         <div>
-          <label htmlFor="diameterRatio" className="block text-sm font-medium text-brandColor1 mb-2">
-            Diameter Ratio (D₂/D₁ - Optional, default: 1)
+          <label htmlFor="diameterRatio" className="block text-sm font-medium text-foreground/80 mb-1">
+            Diameter Ratio (D₂/D₁ <span className="text-xs text-foreground/60">Optional, default: 1</span>)
           </label>
           <input
             id="diameterRatio"
@@ -166,14 +161,14 @@ export default function AffinityCalculator({ curves, pumpModelId, onScaledCurveC
             step="0.05"
             value={diameterRatio}
             onChange={(e) => setDiameterRatio(parseFloat(e.target.value))}
-            className="w-full px-4 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 bg-white text-brandColor1"
-            placeholder="e.g., 0.9"
+            className="w-full px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm"
+            placeholder="e.g., 0.9 or 1.1"
           />
         </div>
 
         <button
           onClick={handleCalculateScaledCurve}
-          className="w-full px-6 py-3 bg-brandColor1 text-brandColor5 rounded-lg hover:bg-brandColor2 focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+          className="w-full flex justify-center px-6 py-2.5 mt-1 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brandColor3 hover:bg-brandColor4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandColor3 dark:focus:ring-offset-background transition-colors disabled:opacity-60"
           disabled={isLoading || !selectedCurveId}
         >
           {isLoading ? (
@@ -182,7 +177,7 @@ export default function AffinityCalculator({ curves, pumpModelId, onScaledCurveC
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
           ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"> {/* Added mr-2 to icon */}
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
             </svg>
           )}
@@ -190,16 +185,16 @@ export default function AffinityCalculator({ curves, pumpModelId, onScaledCurveC
         </button>
       </div>
 
-      <div className="mt-6 p-4 bg-white rounded-lg border border-brandColor3">
-        <h3 className="text-sm font-medium text-brandColor1 mb-2">Affinity Law Formulas (Server Calculated):</h3>
-        <ul className="space-y-1 text-sm text-brandColor1">
-          <li>• Flow (Q₂) = Q₁ × (N₂/N₁) × (D₂/D₁)</li>
-          <li>• Head (H₂) = H₁ × (N₂/N₁)² × (D₂/D₁)²</li>
-          <li>• Power (P₂) = P₁ × (N₂/N₁)³ × (D₂/D₁)³</li>
-          <li>• Efficiency (η) remains unchanged.</li>
+      <div className="mt-6 p-4 bg-background/50 dark:bg-zinc-800/30 rounded-lg border border-brandColor1/30">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/70 mb-2">Affinity Law Formulas:</h3>
+        <ul className="space-y-1 text-sm text-foreground/80">
+          <li>Q₂ = Q₁ × (N₂/N₁) × (D₂/D₁)</li>
+          <li>H₂ = H₁ × (N₂/N₁)² × (D₂/D₁)²</li>
+          <li>P₂ = P₁ × (N₂/N₁)³ × (D₂/D₁)³</li>
+          <li className="italic text-xs text-foreground/60">* Efficiency (η) is assumed constant for ideal scaling.</li>
         </ul>
-         <p className="text-xs text-gray-500 mt-2">Note: (N₂/N₁) is Speed Ratio, (D₂/D₁) is Diameter Ratio.</p>
+         <p className="text-xs text-foreground/60 mt-2">Note: N = Speed, D = Impeller Diameter. Subscript 1 is original, 2 is new.</p>
       </div>
-    </div>
+    </>
   );
 }
