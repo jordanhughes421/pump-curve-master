@@ -67,7 +67,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 bg-content-background rounded-xl shadow-lg">
+    <div className="max-w-7xl mx-auto bg-content-background rounded-xl shadow-lg px-4 pb-4 pt-8 sm:px-6 sm:pb-6 sm:pt-12 lg:px-8 lg:pb-8 lg:pt-16">
       <h1 className="text-3xl font-bold text-foreground mb-6 pb-4 border-b border-brandColor2">
         Dashboard
       </h1>
