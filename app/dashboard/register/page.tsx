@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/app/dashboard/user-provider';
+import Link from 'next/link'; // Moved Link import to top
 
 const RegisterPage = () => {
   const [email, setEmail] = useState('');
@@ -51,8 +52,6 @@ const RegisterPage = () => {
       }
     }
   };
-
-import Link from 'next/link'; // Added Link import
 
   // Show loading state while checking authentication
   if (isLoading) {
