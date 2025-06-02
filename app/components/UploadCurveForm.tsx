@@ -160,19 +160,19 @@ export default function UploadCurveForm({ pumpId, onSuccess, existingCurves, edi
   };
 
   return (
-    <div className="bg-brandColor5 rounded-xl shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-brandColor1 mb-2">
+    <div className="bg-background rounded-xl shadow-md p-4 sm:p-6 border border-brandColor1/50">
+      <h2 className="text-xl font-semibold text-foreground/90 mb-2">
         {editingCurve ? 'Edit Performance Curve' : 'Add New Performance Curve'}
       </h2>
-      <p className="text-brandColor1 mb-6">
-        {editingCurve 
+      <p className="text-sm text-foreground/70 mb-6">
+        {editingCurve
           ? 'Update the performance curve data below.'
           : 'Enter the pump performance curve data below. Press Enter to add more points and Backspace to remove points.'}
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="speed" className="block text-sm font-medium text-brandColor1 mb-2">
+          <label htmlFor="speed" className="block text-sm font-medium text-foreground/80 mb-1">
             Speed (RPM)
           </label>
           <input
@@ -180,53 +180,57 @@ export default function UploadCurveForm({ pumpId, onSuccess, existingCurves, edi
             id="speed"
             value={speed}
             onChange={(e) => setSpeed(e.target.value)}
-            className="w-full px-4 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 bg-white text-brandColor1"
+            className="w-full px-3 py-2 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50"
+            placeholder="e.g., 3500"
             required
           />
         </div>
 
         <div>
-          <h3 className="text-lg font-medium text-brandColor1 mb-4">Curve Points</h3>
+          <h3 className="text-lg font-medium text-foreground/80 mb-4">Curve Points</h3>
           <div className="space-y-4">
             {points.map((point, index) => (
               <div
                 key={index}
-                className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-white rounded-lg border border-brandColor3 hover:border-brandColor1 transition-colors"
+                className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-background/50 dark:bg-zinc-800/30 rounded-lg border border-brandColor1/30 hover:border-brandColor2 transition-colors"
               >
                 <div>
-                  <label className="block text-sm font-medium text-brandColor1 mb-1">Flow (GPM)</label>
+                  <label className="block text-sm font-medium text-foreground/80 mb-1">Flow (GPM)</label>
                   <input
                     type="number"
                     value={point.flow}
                     onChange={(e) => updatePoint(index, 'flow', e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, index, 'flow')}
-                    className="w-full px-3 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 text-brandColor1"
+                    className="w-full px-3 py-2 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50"
+                    placeholder="0"
                     data-index={index}
                     data-field="flow"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-brandColor1 mb-1">Head (ft)</label>
+                  <label className="block text-sm font-medium text-foreground/80 mb-1">Head (ft)</label>
                   <input
                     type="number"
                     value={point.head}
                     onChange={(e) => updatePoint(index, 'head', e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, index, 'head')}
-                    className="w-full px-3 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 text-brandColor1"
+                    className="w-full px-3 py-2 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50"
+                    placeholder="0"
                     data-index={index}
                     data-field="head"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-brandColor1 mb-1">Efficiency (%)</label>
+                  <label className="block text-sm font-medium text-foreground/80 mb-1">Efficiency (%)</label>
                   <input
                     type="number"
                     value={point.efficiency}
                     onChange={(e) => updatePoint(index, 'efficiency', e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, index, 'efficiency')}
-                    className="w-full px-3 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 text-brandColor1"
+                    className="w-full px-3 py-2 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50"
+                    placeholder="0"
                     data-index={index}
                     data-field="efficiency"
                     required
@@ -234,13 +238,14 @@ export default function UploadCurveForm({ pumpId, onSuccess, existingCurves, edi
                 </div>
                 <div className="flex items-end gap-2">
                   <div className="flex-1">
-                    <label className="block text-sm font-medium text-brandColor1 mb-1">Power (HP)</label>
+                    <label className="block text-sm font-medium text-foreground/80 mb-1">Power (HP)</label>
                     <input
                       type="number"
                       value={point.power}
                       onChange={(e) => updatePoint(index, 'power', e.target.value)}
                       onKeyDown={(e) => handleKeyDown(e, index, 'power')}
-                      className="w-full px-3 py-2 border border-brandColor3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 text-brandColor1"
+                      className="w-full px-3 py-2 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50"
+                      placeholder="0"
                       data-index={index}
                       data-field="power"
                       required
@@ -250,7 +255,7 @@ export default function UploadCurveForm({ pumpId, onSuccess, existingCurves, edi
                     <button
                       type="button"
                       onClick={() => removePoint(index)}
-                      className="p-2 text-red-500 hover:text-red-600 focus:outline-none rounded-full hover:bg-red-50 transition-colors"
+                      className="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500 focus:outline-none rounded-full hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
                       title="Remove point"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -265,7 +270,7 @@ export default function UploadCurveForm({ pumpId, onSuccess, existingCurves, edi
           <button
             type="button"
             onClick={addPoint}
-            className="mt-4 px-4 py-2 bg-brandColor1 text-brandColor5 rounded-lg hover:bg-brandColor2 focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 transition-colors flex items-center gap-2"
+            className="mt-4 px-4 py-2 bg-brandColor2/50 dark:bg-brandColor2/70 text-foreground hover:bg-brandColor2/70 dark:hover:bg-brandColor2 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor3 transition-colors flex items-center gap-2 text-sm"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
@@ -275,7 +280,7 @@ export default function UploadCurveForm({ pumpId, onSuccess, existingCurves, edi
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm">
             {error}
           </div>
         )}
@@ -287,9 +292,9 @@ export default function UploadCurveForm({ pumpId, onSuccess, existingCurves, edi
               onClick={() => {
                 setSpeed('');
                 setPoints([{ flow: '', head: '', efficiency: '', power: '' }]);
-                onSuccess();
+                onSuccess(); // This might need to be more like a "clear form" or "cancel edit"
               }}
-              className="px-4 py-2 border border-brandColor3 text-brandColor1 rounded-lg hover:bg-brandColor3 focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 transition-colors"
+              className="px-4 py-2 border border-brandColor1/50 text-foreground/80 rounded-lg hover:bg-brandColor1/10 dark:hover:bg-brandColor1/20 focus:outline-none focus:ring-2 focus:ring-brandColor2 transition-colors text-sm"
             >
               Cancel
             </button>
@@ -297,7 +302,7 @@ export default function UploadCurveForm({ pumpId, onSuccess, existingCurves, edi
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-brandColor1 text-brandColor5 rounded-lg hover:bg-brandColor2 focus:outline-none focus:ring-2 focus:ring-brandColor1 focus:border-brandColor1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-6 py-2 bg-brandColor3 hover:bg-brandColor4 text-white dark:bg-brandColor3 dark:hover:bg-brandColor2 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandColor3 dark:focus:ring-offset-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-semibold"
           >
             {loading ? (
               <>
@@ -320,4 +325,4 @@ export default function UploadCurveForm({ pumpId, onSuccess, existingCurves, edi
       </form>
     </div>
   );
-} 
+}

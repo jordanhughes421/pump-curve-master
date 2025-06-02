@@ -14,6 +14,7 @@ const config: Config = {
         brandColor3: 'var(--brandColor3)',
         brandColor4: 'var(--brandColor4)',
         brandColor5: 'var(--brandColor5)',
+        'content-background': 'var(--color-content-background)',
       },
     },
   },

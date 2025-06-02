@@ -70,8 +70,8 @@ const Header = () => {
     }
 
     return (
-        <header className="md:flex bg-brandColor1">  {/* Use brandColor1 for background */}
-            <div className="container mx-auto flex justify-between items-center bg-brandColor1 text-brandColor5 p-4">
+        <header className="md:flex bg-content-background border-b border-brandColor2">
+            <div className="container mx-auto flex justify-between items-center text-brandColor5 p-4">
                 <h1 className="text-lg text-brandColor4 font-bold">Pump Selection</h1>
                 <button className="text-brandColor4 md:hidden" onClick={() => setIsOpen(!isOpen)}>
                     <svg className="w-6 h-6" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
