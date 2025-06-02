@@ -14,11 +14,6 @@ Users can register for an account using the following methods:
     *   Users can create an account by providing their email address and a password.
     *   The system will validate the email format and password strength (details to be specified).
     *   Upon successful registration, a new `User` record is created in the database.
-*   **Google OAuth:**
-    *   Users can register using their existing Google account.
-    *   The system will redirect the user to Google for authentication.
-    *   Upon successful authentication and consent, Google provides user information (name, email, profile picture).
-    *   A new `User` record is created, and an associated `Account` record is created to link the user to their Google identity.
 
 ### 2. User Login
 
@@ -27,10 +22,6 @@ Registered users can log in using the following methods:
 *   **Email and Password:**
     *   Users enter their registered email and password.
     *   The system verifies the credentials against the stored `User` data.
-*   **Google OAuth:**
-    *   Users can log in by selecting the "Sign in with Google" option.
-    *   The system redirects the user to Google for authentication.
-    *   If the user has previously registered or logged in with this Google account, the system links them to their existing `User` record via the `Account` table.
 
 ### 3. User Logout
 
