@@ -3,10 +3,10 @@ import prisma from '@/lib/prisma';
 
 export async function POST(
   request: Request,
-  { params }: { params: { bomItemId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const bomItemId = parseInt(params.bomItemId);
+    const bomItemId = parseInt(params.id);
     if (isNaN(bomItemId)) {
       return NextResponse.json({ error: 'Invalid BOM item ID' }, { status: 400 });
     }
@@ -43,7 +43,7 @@ export async function POST(
 
     return NextResponse.json(newCustomField, { status: 201 });
   } catch (error: any) {
-    console.error(`Failed to add custom field to BOM item ${params.bomItemId}:`, error);
+    console.error(`Failed to add custom field to BOM item ${params.id}:`, error);
     // Example: Handle if a custom field with the same name should be unique per BOMItem (requires schema adjustment)
     // if (error.code === 'P2002') { 
     //   return NextResponse.json({ error: 'Custom field with this name already exists for this BOM item.' }, { status: 409 });
