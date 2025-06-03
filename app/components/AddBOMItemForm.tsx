@@ -114,7 +114,6 @@ const AddBOMItemForm: React.FC<AddBOMItemFormProps> = ({ pumpId, parentId, onBOM
       // }
       // This part is commented out as it requires sequential API calls and more robust error handling.
 
-      const newBOMItem = await response.json();
       let allCustomFieldsAddedSuccessfully = true;
       const customFieldErrors: string[] = [];
 
