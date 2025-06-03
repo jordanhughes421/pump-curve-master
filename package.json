@@ -12,7 +12,7 @@
     "start:dev": "next start",
     "lint": "next lint",
     "database": "npx prisma studio",
-    "postinstall": "prisma generate && prisma db push --force-reset"
+    "postinstall": "prisma generate && prisma db push"
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",
