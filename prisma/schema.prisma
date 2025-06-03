@@ -69,10 +69,31 @@ model PumpModel {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   userId       Int
-  bomItems     BOMItem[] // Renamed from bom to bomItems
+  boms         BOM[] // Relation to the new BOM model
   documents    Document[]
   curves       PumpCurve[]
   createdBy    User        @relation(fields: [userId], references: [id])
+}
+
+model BOM {
+  id            Int                    @id @default(autoincrement())
+  name          String
+  pumpModelId   Int
+  pumpModel     PumpModel              @relation(fields: [pumpModelId], references: [id])
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  items         BOMItem[]
+  customFields  BOMHeaderCustomField[]
+}
+
+model BOMHeaderCustomField {
+  id        Int      @id @default(autoincrement())
+  name      String
+  value     String
+  bomId     Int
+  bom       BOM      @relation(fields: [bomId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model PumpCurve {
@@ -106,7 +127,7 @@ model Document {
 
 model BOMItem {
   id          Int        @id @default(autoincrement())
-  pumpModelId Int? // Made optional
+  bomId       Int // Foreign key to BOM
   partNumber  String
   description String
   quantity    Int
@@ -114,7 +135,7 @@ model BOMItem {
   supplier    String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  pumpModel   PumpModel? @relation(fields: [pumpModelId], references: [id]) // Made optional
+  bom         BOM        @relation(fields: [bomId], references: [id]) // Relation to BOM
 
   // Self-referencing relation for parent-child
   parentId     Int?

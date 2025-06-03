@@ -23,14 +23,14 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const pumpId = parseInt(params.id);
+    const idInt = parseInt(params.id);
 
-    if (isNaN(pumpId)) {
+    if (isNaN(idInt)) {
       return NextResponse.json({ error: 'Invalid pump ID' }, { status: 400 });
     }
 
     const pump = await prisma.pumpModel.findUnique({
-      where: { id: pumpId },
+      where: { id: idInt },
     });
 
     if (!pump) {
@@ -43,7 +43,7 @@ export async function GET(
     // Fetch top-level BOMItems (those without a parentId for this pump)
     const topLevelBOMItems = await prisma.bOMItem.findMany({
       where: {
-        pumpModelId: pumpId,
+        bom: { pumpModelId: idInt },
         parentId: null, // Only top-level items
       },
       include: {
@@ -72,15 +72,15 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const pumpId = parseInt(params.id);
+    const idInt = parseInt(params.id);
 
-    if (isNaN(pumpId)) {
+    if (isNaN(idInt)) {
       return NextResponse.json({ error: 'Invalid pump ID' }, { status: 400 });
     }
 
     // Check if pump exists
     const pump = await prisma.pumpModel.findUnique({
-      where: { id: pumpId },
+      where: { id: idInt },
     });
 
     if (!pump) {
@@ -91,9 +91,9 @@ export async function POST(
     }
 
     const data = await request.json();
-    const { partNumber, description, quantity, unit, supplier, parentId } = data;
+    const { partNumber, description, quantity, unit, supplier, parentId, bomId } = data;
 
-    if (!partNumber || !description || quantity === undefined || !unit) {
+    if (!partNumber || !description || quantity === undefined || !unit || bomId === undefined) {
       return NextResponse.json(
         { error: 'Missing required BOM item fields' },
         { status: 400 }
@@ -123,7 +123,7 @@ export async function POST(
         quantity: parseInt(quantity),
         unit,
         supplier: supplier || null,
-        pumpModelId: pumpId, // Associate with the pump
+        bomId: parseInt(bomId), // Added
         parentId: parentId ? parseInt(parentId) : null, // Associate with parent if provided
       },
       include: {

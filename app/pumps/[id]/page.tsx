@@ -9,31 +9,15 @@ import AffinityCalculator from '@/app/components/AffinityCalculator';
 import NestedBOMView from '@/app/components/NestedBOMView';
 import AddBOMItemForm from '@/app/components/AddBOMItemForm';
 import EditBOMItemForm from '@/app/components/EditBOMItemForm';
-
-// BOM Types (ideally from a shared types file)
-interface BOMCustomFieldData {
-  id: number;
-  name: string;
-  value: string;
-}
-
-interface BOMItemData {
-  id: number;
-  partNumber: string;
-  description: string;
-  quantity: number;
-  unit: string;
-  supplier: string | null;
-  customFields: BOMCustomFieldData[];
-  children: BOMItemData[];
-  // parentId?: number | null; // Optional: if needed directly on the object
-  // pumpModelId?: number; // Optional: if needed directly on the object
-}
+import BOMListManager from '@/app/components/BOMListManager';
+import BOMHeaderDisplay from '@/app/components/BOMHeaderDisplay';
+import { BOM, PumpModel as PagePumpModel, BOMItem, ApiError, GetBOMByIdResponse } from '@/lib/types'; // Use shared types
+import type { PumpCurve } from '../../../types';
 
 
-interface PumpModel {
-  id: number;
-  name: string;
+// Interface for PumpModel used in this page (can be different from lib/types.PumpModel if needed)
+interface PumpModel extends PagePumpModel { 
+  // Already in PagePumpModel: id, name
   type: string;
   manufacturer: string;
   modelNumber: string;
@@ -43,56 +27,93 @@ interface PumpModel {
   description: string;
 }
 
-import type { PumpCurve } from '../../../types';
 
 export default function PumpDetailsPage() {
   const params = useParams();
+  const pumpId = params.id as string; // Assuming params.id is always string
+
   const [pump, setPump] = useState<PumpModel | null>(null);
   const [curves, setCurves] = useState<PumpCurve[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingCurve, setEditingCurve] = useState<PumpCurve | undefined>(undefined);
 
-  // BOM State
-  const [showAddBOMForm, setShowAddBOMForm] = useState(false);
-  const [editingBOMItem, setEditingBOMItem] = useState<BOMItemData | null>(null);
-  const [currentBOMParentId, setCurrentBOMParentId] = useState<number | null>(null);
-  const [bomUpdateKey, setBomUpdateKey] = useState(0); // Increment to trigger NestedBOMView refresh
+  // New BOM State
+  const [selectedBomId, setSelectedBomId] = useState<string | null>(null);
+  const [currentBOM, setCurrentBOM] = useState<BOM | null>(null);
+  const [bomLoading, setBomLoading] = useState(false);
+  const [bomError, setBomError] = useState<string | null>(null);
+  const [refreshBomTrigger, setRefreshBomTrigger] = useState(0); // To trigger NestedBOMView refresh
+
+  // State for BOM Item Forms
+  const [showAddItemForm, setShowAddItemForm] = useState(false);
+  const [showEditItemForm, setShowEditItemForm] = useState(false);
+  const [editingBOMItem, setEditingBOMItem] = useState<BOMItem | null>(null);
+  const [currentParentItemId, setCurrentParentItemId] = useState<number | null>(null);
+
 
   useEffect(() => {
     const fetchPumpData = async () => {
+      if (!pumpId) return;
       try {
         const [pumpResponse, curvesResponse] = await Promise.all([
-          fetch(`/api/pumps/${params.id}`),
-          fetch(`/api/pumps/${params.id}/curves`),
+          fetch(`/api/pumps/${pumpId}`),
+          fetch(`/api/pumps/${pumpId}/curves`),
         ]);
 
         if (!pumpResponse.ok || !curvesResponse.ok) {
-          throw new Error('Failed to fetch pump data');
+          throw new Error('Failed to fetch pump data or curves');
         }
 
-        const [pumpData, curvesData] = await Promise.all([
-          pumpResponse.json(),
-          curvesResponse.json(),
-        ]);
+        const pumpData: PumpModel = await pumpResponse.json();
+        const curvesData: PumpCurve[] = await curvesResponse.json();
 
         setPump(pumpData);
         setCurves(curvesData);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch pump data');
+        setError(err instanceof Error ? err.message : 'Failed to fetch initial pump data');
       } finally {
         setLoading(false);
       }
     };
 
-    if (params.id) {
-      fetchPumpData();
-    }
-  }, [params.id]);
+    fetchPumpData();
+  }, [pumpId]);
+
+  // Effect to fetch full BOM details when selectedBomId changes
+  useEffect(() => {
+    const fetchFullBOMDetails = async () => {
+      if (!selectedBomId) {
+        setCurrentBOM(null);
+        setBomError(null);
+        return;
+      }
+      setBomLoading(true);
+      setBomError(null);
+      try {
+        const response = await fetch(`/api/boms/${selectedBomId}`);
+        if (!response.ok) {
+          const errorData: ApiError = await response.json();
+          throw new Error(errorData.error || `Failed to fetch BOM details: ${response.statusText}`);
+        }
+        const data: GetBOMByIdResponse = await response.json();
+        setCurrentBOM(data);
+      } catch (err: any) {
+        setBomError(err.message);
+        setCurrentBOM(null);
+      } finally {
+        setBomLoading(false);
+      }
+    };
+
+    fetchFullBOMDetails();
+  }, [selectedBomId]);
+
 
   const handleCurveSuccess = async () => {
+    if (!pumpId) return;
     try {
-      const response = await fetch(`/api/pumps/${params.id}/curves`);
+      const response = await fetch(`/api/pumps/${pumpId}/curves`);
       if (!response.ok) {
         throw new Error('Failed to fetch updated curves');
       }
@@ -109,10 +130,10 @@ export default function PumpDetailsPage() {
   };
 
   const handleDeleteCurve = async (curveId: number) => {
-    if (!confirm('Are you sure you want to delete this curve?')) return;
+    if (!pumpId || !confirm('Are you sure you want to delete this curve?')) return;
 
     try {
-      const response = await fetch(`/api/pumps/${params.id}/curves/${curveId}`, {
+      const response = await fetch(`/api/pumps/${pumpId}/curves/${curveId}`, {
         method: 'DELETE',
       });
 
@@ -165,48 +186,130 @@ export default function PumpDetailsPage() {
     // e.g., toast.success('Curve scaled successfully!');
   };
 
-  // --- BOM Action Handlers ---
-  const handleAddBOMItemClick = (parentId: number | null) => {
-    setCurrentBOMParentId(parentId);
-    setEditingBOMItem(null); // Ensure edit form is hidden
-    setShowAddBOMForm(true);
+  // --- BOM Action Handlers (Old - Need refactoring or removal) ---
+  // const handleAddBOMItemClick = (parentId: number | null) => {
+  //   setCurrentBOMParentId(parentId);
+  //   setEditingBOMItem(null);
+  //   setShowAddBOMForm(true);
+  // };
+
+  // const handleEditBOMItemClick = (item: BOMItem) => { // BOMItem from lib/types
+  //   setEditingBOMItem(item);
+  //   setShowAddBOMForm(false); 
+  // };
+
+  // const handleDeleteBOMItem = async (itemId: number) => {
+  //   try {
+  //     const response = await fetch(`/api/bom-items/${itemId}`, {
+  //       method: 'DELETE',
+  //     });
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.error || 'Failed to delete BOM item');
+  //     }
+  //     // Refreshing the selected BOM to reflect deletion
+  //     if (selectedBomId) {
+  //       const fetchResponse = await fetch(`/api/boms/${selectedBomId}`);
+  //       if (fetchResponse.ok) setCurrentBOM(await fetchResponse.json());
+  //       else setCurrentBOM(null); // Or handle error more gracefully
+  //     }
+  //   } catch (err: any) {
+  //     setBomError(err.message || 'Failed to delete BOM item.');
+  //   }
+  // };
+
+  // const handleBOMFormSuccess = () => {
+  //   setShowAddBOMForm(false);
+  //   setEditingBOMItem(null);
+  //   // Refreshing the selected BOM
+  //    if (selectedBomId) {
+  //       fetch(`/api/boms/${selectedBomId}`).then(res => res.json()).then(data => setCurrentBOM(data));
+  //    }
+  // };
+
+  // const handleBOMFormCancel = () => {
+  //   setShowAddBOMForm(false);
+  //   setEditingBOMItem(null);
+  // };
+  // --- End BOM Action Handlers ---
+
+  const handleBomCreated = (newBom: BOM) => {
+    setSelectedBomId(newBom.id.toString()); // Auto-select new BOM
+    // currentBOM will be fetched by the useEffect listening to selectedBomId
   };
 
-  const handleEditBOMItemClick = (item: BOMItemData) => {
-    setEditingBOMItem(item);
-    setShowAddBOMForm(false); // Ensure add form is hidden
-  };
-
-  const handleDeleteBOMItem = async (itemId: number) => {
-    // Confirmation is handled in NestedBOMView
-    try {
-      const response = await fetch(`/api/bom-items/${itemId}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to delete BOM item');
-      }
-      // alert('BOM Item deleted successfully'); // Or use a toast notification
-      setBomUpdateKey(prevKey => prevKey + 1); // Trigger refresh
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete BOM item.'); // Show error on page or via toast
-      // alert(`Error deleting BOM item: ${err.message}`);
+  const handleBomDataChanged = () => {
+    // This function is called when BOM header custom fields change, 
+    // or BOM items are added/edited/deleted, or selected BOM name is updated.
+    if (selectedBomId) {
+      // Re-fetch the current BOM details to get the latest data
+      setBomLoading(true);
+      fetch(`/api/boms/${selectedBomId}`)
+        .then(res => {
+          if (!res.ok) {
+            // If BOM not found (e.g., deleted then attempted refresh), clear it.
+            if (res.status === 404) {
+              setCurrentBOM(null);
+              // selectedBomId might already be null if deletion was handled by BOMListManager callback
+              // but good to be defensive.
+              setSelectedBomId(null); 
+              return null;
+            }
+            throw new Error('Failed to re-fetch BOM details');
+          }
+          return res.json();
+        })
+        .then((data: GetBOMByIdResponse | null) => {
+          setCurrentBOM(data); // data could be null if 404 was handled
+          setRefreshBomTrigger(prev => prev + 1); 
+        })
+        .catch(err => {
+          setBomError(err.message);
+          setCurrentBOM(null); // Clear BOM on error
+        })
+        .finally(() => setBomLoading(false));
+    } else {
+      // If no selectedBomId, ensure currentBOM is also null
+      setCurrentBOM(null);
+      setRefreshBomTrigger(prev => prev + 1);
     }
   };
 
-  const handleBOMFormSuccess = () => {
-    setShowAddBOMForm(false);
-    setEditingBOMItem(null);
-    setBomUpdateKey(prevKey => prevKey + 1);
-    // alert('BOM operation successful!'); // Or use a toast
+  const handleSelectedBomNameUpdated = (updatedBOMData: { id: number; name: string }) => {
+    // If the currently selected BOM's name was updated by BOMListManager
+    if (currentBOM && currentBOM.id === updatedBOMData.id) {
+      // Option 1: Update currentBOM directly with new name (partial update)
+      // setCurrentBOM(prev => prev ? { ...prev, name: updatedBOMData.name } : null);
+      // Option 2: Re-fetch the full BOM data to ensure consistency (safer)
+      handleBomDataChanged();
+    }
+  };
+  
+  // BOM Item Form Handlers
+  const openAddBOMItemForm = (parentId: number | null) => {
+    setCurrentParentItemId(parentId);
+    setShowEditItemForm(false); // Ensure edit form is hidden
+    setShowAddItemForm(true);
   };
 
-  const handleBOMFormCancel = () => {
-    setShowAddBOMForm(false);
-    setEditingBOMItem(null);
+  const openEditBOMItemForm = (item: BOMItem) => {
+    setEditingBOMItem(item);
+    setShowAddItemForm(false); // Ensure add form is hidden
+    setShowEditItemForm(true);
   };
-  // --- End BOM Action Handlers ---
+  
+  const handleCloseBOMItemForms = () => {
+    setShowAddItemForm(false);
+    setShowEditItemForm(false);
+    setEditingBOMItem(null);
+    setCurrentParentItemId(null);
+  };
+
+  const handleBOMItemFormSuccess = () => {
+    handleCloseBOMItemForms();
+    handleBomDataChanged(); // Refresh the BOM data
+  };
+
 
   if (loading) {
     return (
@@ -317,48 +420,84 @@ export default function PumpDetailsPage() {
 
         {/* Bill of Materials Section */}
         <div className="mt-12 pt-8 border-t border-brandColor2">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-bold text-foreground">Bill of Materials</h2>
-            <button
-              onClick={() => handleAddBOMItemClick(null)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            >
-              Add Top-Level BOM Item
-            </button>
-          </div>
+          <h2 className="text-3xl font-bold text-foreground mb-6">Bill of Materials Management</h2>
+          
+          <BOMListManager 
+            pumpId={pumpId} // pumpId is string, BOMListManager expects string
+            selectedBomId={selectedBomId}
+            onSelectBOM={(bomId) => {
+              setSelectedBomId(bomId);
+              if (!bomId) setCurrentBOM(null); // Clear currentBOM if deselected
+            }}
+            onBomCreated={handleBomCreated}
+            onBomUpdated={handleSelectedBomNameUpdated}
+          />
 
-          {/* Conditional Forms Display */}
-          {showAddBOMForm && (
-            <div className="mb-8 p-4 bg-background rounded-xl shadow-md border border-brandColor1/50">
-              <AddBOMItemForm
-                pumpId={pump.id}
-                parentId={currentBOMParentId}
-                onBOMItemAdded={handleBOMFormSuccess}
-                onCancel={handleBOMFormCancel}
-              />
-            </div>
-          )}
-
-          {editingBOMItem && (
-            <div className="mb-8 p-4 bg-background rounded-xl shadow-md border border-brandColor1/50">
-              <EditBOMItemForm
-                initialData={editingBOMItem}
-                onBOMItemUpdated={handleBOMFormSuccess}
-                onCancel={handleBOMFormCancel}
-              />
-            </div>
+          {bomLoading && <p className="text-center py-4">Loading BOM details...</p>}
+          {bomError && <p className="text-center py-4 text-red-500">Error loading BOM: {bomError}</p>}
+          
+          {currentBOM && !bomLoading && !bomError && (
+            <BOMHeaderDisplay bom={currentBOM} onDataChange={handleBomDataChanged} />
           )}
           
-          {/* Nested BOM View */}
-          <div className="bg-background rounded-xl shadow-md p-4 sm:p-6 border border-brandColor1/50">
-            <NestedBOMView
-              pumpId={pump.id}
-              bomUpdateKey={bomUpdateKey}
-              onEditItem={handleEditBOMItemClick}
-              onAddItem={handleAddBOMItemClick}
-              onDeleteItem={handleDeleteBOMItem}
-            />
-          </div>
+          {/* Forms for Adding/Editing BOM Items - Rendered as Modals or Inline */}
+          {/* For simplicity, these could be rendered in a modal structure or a dedicated section */}
+          {selectedBomId && (
+            <div className="mt-6">
+              {showAddItemForm && (
+                <div className="my-4 p-4 border rounded-lg shadow-md">
+                  <h3 className="text-xl font-semibold mb-2">Add New BOM Item</h3>
+                  <AddBOMItemForm 
+                    bomId={selectedBomId} 
+                    parentId={currentParentItemId}
+                    onBOMItemAdded={handleBOMItemFormSuccess}
+                    onCancel={handleCloseBOMItemForms}
+                  />
+                </div>
+              )}
+              {showEditItemForm && editingBOMItem && (
+                 <div className="my-4 p-4 border rounded-lg shadow-md">
+                  <h3 className="text-xl font-semibold mb-2">Edit BOM Item: {editingBOMItem.partNumber}</h3>
+                  <EditBOMItemForm 
+                    initialData={editingBOMItem}
+                    onBOMItemUpdated={handleBOMItemFormSuccess}
+                    onCancel={handleCloseBOMItemForms}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+
+          {/* Nested BOM View for the selected BOM ID */}
+          {selectedBomId && (
+            <div className="mt-6 bg-background rounded-xl shadow-md p-4 sm:p-6 border border-brandColor1/50">
+               {/* Button to trigger Add Item form for top-level items in current BOM */}
+              {!showAddItemForm && !showEditItemForm && (
+                <button 
+                  onClick={() => openAddBOMItemForm(null)} 
+                  className="mb-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                >
+                  Add Item to this BOM
+                </button>
+              )}
+              <NestedBOMView
+                bomId={selectedBomId}
+                // Pass down functions to open forms for editing or adding child items
+                // NestedBOMView will need to be updated to use these.
+                // For now, these are illustrative; NestedBOMView's internal structure might need adjustment.
+                onEditItem={openEditBOMItemForm}
+                onAddItem={openAddBOMItemForm} // This would be for "Add Child" from within an item
+                onDeleteItem={handleBomDataChanged} // After delete, refresh BOM
+                key={refreshBomTrigger} // Force re-render/re-fetch if BOM structure changes
+              />
+            </div>
+          )}
+          {!selectedBomId && !bomLoading && (
+            <p className="mt-6 p-4 text-center text-foreground/70 bg-background rounded-xl shadow-md border border-brandColor1/50">
+              Select a BOM from the list above to view its details and items, or create a new BOM.
+            </p>
+          )}
         </div>
       </div>
     </div>

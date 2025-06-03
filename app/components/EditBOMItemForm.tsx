@@ -1,33 +1,16 @@
 'use client';
 
 import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react';
-
-// Interfaces from previous components (assuming they are accessible or defined here)
-interface BOMCustomFieldData {
-  id: number;
-  name: string;
-  value: string;
-}
-
-interface BOMItemData {
-  id: number;
-  partNumber: string;
-  description: string;
-  quantity: number;
-  unit: string;
-  supplier: string | null;
-  customFields: BOMCustomFieldData[];
-  // other fields like parentId, pumpModelId etc. are not directly edited here but part of the object
-}
+import { BOMItem, BOMItemCustomField } from '@/lib/types'; // Using shared types
 
 // State for custom fields in the form
-interface FormCustomField extends BOMCustomFieldData {
+interface FormCustomField extends BOMItemCustomField { // Extends shared BOMItemCustomField
   localId: string; // For React key and tracking: 'existing-${db_id}' or 'new-${timestamp}'
   status: 'existing' | 'new' | 'modified' | 'deleted';
 }
 
 interface EditBOMItemFormProps {
-  initialData: BOMItemData;
+  initialData: BOMItem; // Use shared BOMItem type
   onBOMItemUpdated: () => void;
   onCancel: () => void;
 }
@@ -136,12 +119,16 @@ const EditBOMItemForm: React.FC<EditBOMItemFormProps> = ({ initialData, onBOMIte
       for (const field of customFields) {
         try {
           if (field.status === 'new' && field.name && field.value) {
-            const addResponse = await fetch(`/api/bom-items/${initialData.id}/fields`, {
+            // Corrected API endpoint for adding new custom fields
+            const addResponse = await fetch(`/api/bom-items/${initialData.id}/custom-fields`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ name: field.name, value: field.value }),
             });
-            if (!addResponse.ok) throw new Error(`Failed to add new custom field "${field.name}"`);
+            if (!addResponse.ok) {
+                const errorData = await addResponse.json();
+                throw new Error(`Failed to add new custom field "${field.name}": ${errorData.error || addResponse.statusText}`);
+            }
           } else if (field.status === 'modified') {
             const updateResponse = await fetch(`/api/bom-custom-fields/${field.id}`, {
               method: 'PUT',
