@@ -9,13 +9,13 @@ interface CustomFieldEntry {
 }
 
 interface AddBOMItemFormProps {
-  pumpId: number;
+  bomId: string; // Changed from pumpId to bomId
   parentId?: number | null;
   onBOMItemAdded: () => void; // Callback to refresh BOM list
-  onCancel?: () => void; // ADD THIS LINE
+  onCancel?: () => void;
 }
 
-const AddBOMItemForm: React.FC<AddBOMItemFormProps> = ({ pumpId, parentId, onBOMItemAdded, onCancel }) => {
+const AddBOMItemForm: React.FC<AddBOMItemFormProps> = ({ bomId, parentId, onBOMItemAdded, onCancel }) => {
   const [partNumber, setPartNumber] = useState('');
   const [description, setDescription] = useState('');
   const [quantity, setQuantity] = useState<number | string>(''); // Allow string for input flexibility
@@ -78,22 +78,21 @@ const AddBOMItemForm: React.FC<AddBOMItemFormProps> = ({ pumpId, parentId, onBOM
       quantity: finalQuantity,
       unit,
       supplier: supplier || null,
-      pumpModelId: pumpId, 
+      // bomId is now part of the URL, not the payload directly for item creation
     };
 
-    if (parentId) {
+    if (parentId !== undefined && parentId !== null) { // Ensure parentId is explicitly checked
       bomItemData.parentId = parentId;
     }
     
     // Note: Custom fields are not part of the BOMItem creation directly through this endpoint.
     // They would typically be added *after* the BOMItem is created, via /api/bom-items/[bomItemId]/fields
-    // For now, this form collects them, but the API call below doesn't send them.
-    // This would be a point of enhancement if the API supported nested creation.
+    // For now, this form collects them, but the API call below doesn't send them directly.
+    // This would be a point of enhancement if the API supported nested creation for custom fields.
 
     try {
-      // The API endpoint is always /api/pumps/[pumpId]/bom for adding items,
-      // with parentId in the body distinguishing child items.
-      const response = await fetch(`/api/pumps/${pumpId}/bom`, {
+      // API endpoint changed to /api/boms/[bomId]/items
+      const response = await fetch(`/api/boms/${bomId}/items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bomItemData),
@@ -105,24 +104,17 @@ const AddBOMItemForm: React.FC<AddBOMItemFormProps> = ({ pumpId, parentId, onBOM
       }
 
       const newBOMItem = await response.json();
-      setSuccessMessage(`BOM Item "${newBOMItem.partNumber}" added successfully!`);
+      // Success message for the main item will be set after custom fields are processed.
       
-      // If custom fields were collected and need to be added, this is where you'd loop and make calls:
-      // for (const cf of customFields) {
-      //   if (cf.name && cf.value) { // only send if both name and value are present
-      //     await fetch(`/api/bom-items/${newBOMItem.id}/fields`, { /* ... POST cf data ... */});
-      //   }
-      // }
-      // This part is commented out as it requires sequential API calls and more robust error handling.
-
       let allCustomFieldsAddedSuccessfully = true;
       const customFieldErrors: string[] = [];
 
-      if (customFields.length > 0) {
+      if (customFields.length > 0 && newBOMItem && newBOMItem.id) {
         for (const cf of customFields) {
           if (cf.name && cf.value) { // Only send if both name and value are present
             try {
-              const cfResponse = await fetch(`/api/bom-items/${newBOMItem.id}/fields`, {
+              // Corrected API endpoint for adding custom fields to a BOM item
+              const cfResponse = await fetch(`/api/bom-items/${newBOMItem.id}/custom-fields`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: cf.name, value: cf.value }),
