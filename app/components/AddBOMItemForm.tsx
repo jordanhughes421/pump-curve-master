@@ -162,55 +162,55 @@ const AddBOMItemForm: React.FC<AddBOMItemFormProps> = ({ pumpId, parentId, onBOM
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 bg-white shadow-md rounded-lg space-y-6 border border-gray-200">
-      <h3 className="text-xl font-semibold text-gray-800">
+    <form data-testid="add-bom-item-form" onSubmit={handleSubmit} className="p-6 bg-background shadow-lg rounded-xl border border-brandColor1/50 dark:border-brandColor2/70 space-y-6">
+      <h3 className="text-xl font-semibold text-foreground">
         {parentId ? 'Add New Sub-Item' : 'Add New BOM Item'}
       </h3>
 
       {error && (
-        <div className="p-3 bg-red-100 text-red-700 border border-red-300 rounded-md whitespace-pre-line">
+        <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg text-sm whitespace-pre-line">
           {error}
         </div>
       )}
       {successMessage && (
-        <div className="p-3 bg-green-100 text-green-700 border border-green-300 rounded-md">
+        <div className="p-3 bg-green-50 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 rounded-lg text-sm">
           {successMessage}
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="partNumber" className="block text-sm font-medium text-gray-700 mb-1">Part Number <span className="text-red-500">*</span></label>
-          <input type="text" id="partNumber" value={partNumber} onChange={e => setPartNumber(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
+          <label htmlFor="partNumber" className="block text-sm font-medium text-foreground/80 mb-1">Part Number <span className="text-red-500">*</span></label>
+          <input type="text" id="partNumber" value={partNumber} onChange={e => setPartNumber(e.target.value)} required className="w-full px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm"/>
         </div>
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description <span className="text-red-500">*</span></label>
-          <input type="text" id="description" value={description} onChange={e => setDescription(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
+          <label htmlFor="description" className="block text-sm font-medium text-foreground/80 mb-1">Description <span className="text-red-500">*</span></label>
+          <input type="text" id="description" value={description} onChange={e => setDescription(e.target.value)} required className="w-full px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm"/>
         </div>
         <div>
-          <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">Quantity <span className="text-red-500">*</span></label>
-          <input type="number" id="quantity" value={quantity} onChange={e => setQuantity(e.target.value === '' ? '' : Number(e.target.value))} required className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
+          <label htmlFor="quantity" className="block text-sm font-medium text-foreground/80 mb-1">Quantity <span className="text-red-500">*</span></label>
+          <input type="number" id="quantity" value={quantity} onChange={e => setQuantity(e.target.value === '' ? '' : Number(e.target.value))} required className="w-full px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm"/>
         </div>
         <div>
-          <label htmlFor="unit" className="block text-sm font-medium text-gray-700 mb-1">Unit <span className="text-red-500">*</span></label>
-          <input type="text" id="unit" value={unit} onChange={e => setUnit(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
+          <label htmlFor="unit" className="block text-sm font-medium text-foreground/80 mb-1">Unit <span className="text-red-500">*</span></label>
+          <input type="text" id="unit" value={unit} onChange={e => setUnit(e.target.value)} required className="w-full px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm"/>
         </div>
         <div className="md:col-span-2">
-          <label htmlFor="supplier" className="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
-          <input type="text" id="supplier" value={supplier} onChange={e => setSupplier(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
+          <label htmlFor="supplier" className="block text-sm font-medium text-foreground/80 mb-1">Supplier</label>
+          <input type="text" id="supplier" value={supplier} onChange={e => setSupplier(e.target.value)} className="w-full px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm"/>
         </div>
       </div>
 
-      <div className="pt-4 border-t">
-        <h4 className="text-md font-semibold text-gray-700 mb-2">Custom Fields (will be added after item creation)</h4>
+      <div className="pt-4 border-t border-brandColor1/30 dark:border-brandColor2/50">
+        <h4 className="text-md font-semibold text-foreground/90 mb-3 border-b border-brandColor1/30 dark:border-brandColor2/50 pb-2">Custom Fields (will be added after item creation)</h4>
         {customFields.map((field, index) => (
-          <div key={field.id} className="flex items-center space-x-2 mb-3 p-3 border rounded-md bg-gray-50">
-            <input type="text" placeholder="Field Name" value={field.name} onChange={e => handleCustomFieldChange(field.id, 'name', e.target.value)} className="w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"/>
-            <input type="text" placeholder="Field Value" value={field.value} onChange={e => handleCustomFieldChange(field.id, 'value', e.target.value)} className="w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"/>
-            <button type="button" onClick={() => handleRemoveCustomField(field.id)} className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 text-sm">Remove</button>
+          <div key={field.id} className="flex items-center space-x-2 mb-3 p-3 border rounded-md border-brandColor1/40 dark:border-brandColor2/50">
+            <input type="text" placeholder="Field Name" value={field.name} onChange={e => handleCustomFieldChange(field.id, 'name', e.target.value)} className="w-full px-3 py-2 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm"/>
+            <input type="text" placeholder="Field Value" value={field.value} onChange={e => handleCustomFieldChange(field.id, 'value', e.target.value)} className="w-full px-3 py-2 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm"/>
+            <button type="button" onClick={() => handleRemoveCustomField(field.id)} className="px-3 py-1.5 text-xs text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-500/50 rounded-md transition-colors">Remove</button>
           </div>
         ))}
-        <button type="button" onClick={handleAddCustomField} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm">
+        <button type="button" onClick={handleAddCustomField} className="mt-2 px-4 py-2 border border-green-500/50 text-green-700 dark:text-green-400 hover:bg-green-500/10 dark:hover:bg-green-700/20 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors text-sm font-medium rounded-lg">
           Add Custom Field
         </button>
       </div>
@@ -219,14 +219,14 @@ const AddBOMItemForm: React.FC<AddBOMItemFormProps> = ({ pumpId, parentId, onBOM
         <button 
           type="button" 
           onClick={onCancel} 
-          className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+          className="px-6 py-2.5 border border-brandColor1/50 text-foreground/80 rounded-lg hover:bg-brandColor1/10 dark:hover:bg-brandColor1/20 focus:outline-none focus:ring-2 focus:ring-brandColor2 transition-colors text-sm font-medium"
         >
           Cancel
         </button>
         <button 
           type="submit" 
           disabled={isLoading} 
-          className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 disabled:opacity-50"
+          className="px-6 py-2.5 flex items-center justify-center border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brandColor3 hover:bg-brandColor4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandColor3 dark:focus:ring-offset-background transition-colors disabled:opacity-60"
         >
           {isLoading ? 'Adding...' : (parentId ? 'Add Sub-Item' : 'Add BOM Item')}
         </button>
