@@ -69,7 +69,7 @@ model PumpModel {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   userId       Int
-  bom          BOM[]
+  bomItems     BOMItem[] // Renamed from bom to bomItems
   documents    Document[]
   curves       PumpCurve[]
   createdBy    User        @relation(fields: [userId], references: [id])
@@ -83,9 +83,9 @@ model PumpCurve {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   pumpModel   PumpModel @relation(fields: [pumpModelId], references: [id])
-  
+
   // New fields for scaled curves
-  isScaled    Boolean   @default(false)
+  isScaled        Boolean     @default(false)
   originalCurveId Int?
   originalCurve   PumpCurve?  @relation("ScaledCurves", fields: [originalCurveId], references: [id])
   scaledCurves    PumpCurve[] @relation("ScaledCurves")
@@ -104,15 +104,31 @@ model Document {
   pumpModel   PumpModel @relation(fields: [pumpModelId], references: [id])
 }
 
-model BOM {
-  id          Int       @id @default(autoincrement())
-  pumpModelId Int
+model BOMItem {
+  id          Int        @id @default(autoincrement())
+  pumpModelId Int? // Made optional
   partNumber  String
   description String
   quantity    Int
   unit        String
   supplier    String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  pumpModel   PumpModel @relation(fields: [pumpModelId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  pumpModel   PumpModel? @relation(fields: [pumpModelId], references: [id]) // Made optional
+
+  // Self-referencing relation for parent-child
+  parentId     Int?
+  parent       BOMItem?         @relation("BOMItemChildren", fields: [parentId], references: [id])
+  children     BOMItem[]        @relation("BOMItemChildren")
+  customFields BOMCustomField[]
+}
+
+model BOMCustomField {
+  id        Int      @id @default(autoincrement())
+  name      String
+  value     String
+  bomItemId Int
+  bomItem   BOMItem  @relation(fields: [bomItemId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
