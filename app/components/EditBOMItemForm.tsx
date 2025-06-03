@@ -35,7 +35,7 @@ const EditBOMItemForm: React.FC<EditBOMItemFormProps> = ({ initialData, onBOMIte
     setUnit(initialData.unit);
     setSupplier(initialData.supplier || '');
     setCustomFields(
-      initialData.customFields.map(cf => ({
+      (initialData.customFields || []).map(cf => ({
         ...cf,
         localId: `existing-${cf.id}`,
         status: 'existing',
