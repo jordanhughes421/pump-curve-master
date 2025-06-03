@@ -1,27 +1,27 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-// POST /api/bom-items/[bomItemId]/custom-fields - Add a new BOMCustomField to a BOMItem
+// POST /api/bom-items/[id]/custom-fields - Add a new BOMCustomField to a BOMItem
 export async function POST(
   request: Request,
-  { params }: { params: { bomItemId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { bomItemId } = params;
+    const { id } = params;
     const { name, value } = await request.json();
 
     if (!name || value === undefined || value === null) { // value can be an empty string
       return NextResponse.json({ error: 'Custom field name and value are required' }, { status: 400 });
     }
 
-    const bomItemIdInt = parseInt(bomItemId, 10);
-    if (isNaN(bomItemIdInt)) {
+    const idInt = parseInt(id, 10);
+    if (isNaN(idInt)) {
       return NextResponse.json({ error: 'Invalid BOMItem ID' }, { status: 400 });
     }
 
     // Check if BOMItem exists
     const bomItem = await prisma.bOMItem.findUnique({
-      where: { id: bomItemIdInt },
+      where: { id: idInt },
     });
 
     if (!bomItem) {
@@ -32,33 +32,33 @@ export async function POST(
       data: {
         name,
         value,
-        bomItemId: bomItemIdInt,
+        bomItemId: idInt,
       },
     });
 
     return NextResponse.json(newCustomField, { status: 201 });
   } catch (error) {
     console.error('Error creating BOMCustomField:', error);
-    // P2003 can happen if bomItemId is invalid, though the check above should catch it.
+    // P2003 can happen if id is invalid, though the check above should catch it.
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// GET /api/bom-items/[bomItemId]/custom-fields - List all custom fields for a BOMItem
+// GET /api/bom-items/[id]/custom-fields - List all custom fields for a BOMItem
 export async function GET(
     request: Request,
-    { params }: { params: { bomItemId: string } }
+    { params }: { params: { id: string } }
 ) {
     try {
-        const { bomItemId } = params;
-        const bomItemIdInt = parseInt(bomItemId, 10);
+        const { id } = params;
+        const idInt = parseInt(id, 10);
 
-        if (isNaN(bomItemIdInt)) {
+        if (isNaN(idInt)) {
             return NextResponse.json({ error: 'Invalid BOMItem ID' }, { status: 400 });
         }
 
         const bomItem = await prisma.bOMItem.findUnique({
-            where: { id: bomItemIdInt },
+            where: { id: idInt },
         });
 
         if (!bomItem) {
@@ -67,7 +67,7 @@ export async function GET(
 
         const customFields = await prisma.bOMCustomField.findMany({
             where: {
-                bomItemId: bomItemIdInt,
+                bomItemId: idInt,
             },
             orderBy: {
                 createdAt: 'asc',
