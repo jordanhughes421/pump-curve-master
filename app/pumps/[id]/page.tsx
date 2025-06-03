@@ -6,6 +6,30 @@ import PumpCurveChart from '@/app/components/PumpCurveChart';
 import UploadCurveForm from '@/app/components/UploadCurveForm';
 import ExistingCurvesCard from '@/app/components/ExistingCurvesCard';
 import AffinityCalculator from '@/app/components/AffinityCalculator';
+import NestedBOMView from '@/app/components/NestedBOMView';
+import AddBOMItemForm from '@/app/components/AddBOMItemForm';
+import EditBOMItemForm from '@/app/components/EditBOMItemForm';
+
+// BOM Types (ideally from a shared types file)
+interface BOMCustomFieldData {
+  id: number;
+  name: string;
+  value: string;
+}
+
+interface BOMItemData {
+  id: number;
+  partNumber: string;
+  description: string;
+  quantity: number;
+  unit: string;
+  supplier: string | null;
+  customFields: BOMCustomFieldData[];
+  children: BOMItemData[];
+  // parentId?: number | null; // Optional: if needed directly on the object
+  // pumpModelId?: number; // Optional: if needed directly on the object
+}
+
 
 interface PumpModel {
   id: number;
@@ -28,6 +52,12 @@ export default function PumpDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingCurve, setEditingCurve] = useState<PumpCurve | undefined>(undefined);
+
+  // BOM State
+  const [showAddBOMForm, setShowAddBOMForm] = useState(false);
+  const [editingBOMItem, setEditingBOMItem] = useState<BOMItemData | null>(null);
+  const [currentBOMParentId, setCurrentBOMParentId] = useState<number | null>(null);
+  const [bomUpdateKey, setBomUpdateKey] = useState(0); // Increment to trigger NestedBOMView refresh
 
   useEffect(() => {
     const fetchPumpData = async () => {
@@ -135,6 +165,49 @@ export default function PumpDetailsPage() {
     // e.g., toast.success('Curve scaled successfully!');
   };
 
+  // --- BOM Action Handlers ---
+  const handleAddBOMItemClick = (parentId: number | null) => {
+    setCurrentBOMParentId(parentId);
+    setEditingBOMItem(null); // Ensure edit form is hidden
+    setShowAddBOMForm(true);
+  };
+
+  const handleEditBOMItemClick = (item: BOMItemData) => {
+    setEditingBOMItem(item);
+    setShowAddBOMForm(false); // Ensure add form is hidden
+  };
+
+  const handleDeleteBOMItem = async (itemId: number) => {
+    // Confirmation is handled in NestedBOMView
+    try {
+      const response = await fetch(`/api/bom-items/${itemId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete BOM item');
+      }
+      // alert('BOM Item deleted successfully'); // Or use a toast notification
+      setBomUpdateKey(prevKey => prevKey + 1); // Trigger refresh
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete BOM item.'); // Show error on page or via toast
+      // alert(`Error deleting BOM item: ${err.message}`);
+    }
+  };
+
+  const handleBOMFormSuccess = () => {
+    setShowAddBOMForm(false);
+    setEditingBOMItem(null);
+    setBomUpdateKey(prevKey => prevKey + 1);
+    // alert('BOM operation successful!'); // Or use a toast
+  };
+
+  const handleBOMFormCancel = () => {
+    setShowAddBOMForm(false);
+    setEditingBOMItem(null);
+  };
+  // --- End BOM Action Handlers ---
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -174,12 +247,14 @@ export default function PumpDetailsPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 bg-content-background rounded-xl shadow-lg">
+        {/* Pump Info Header */}
         <div className="mb-8 pb-6 border-b border-brandColor2">
           <h1 className="text-4xl font-bold text-foreground mb-2">{pump.name}</h1>
           <p className="text-lg text-foreground/80">{pump.description}</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Main Content Grid - Curves and Specs */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Left Column - Pump Specifications */}
           <div className="space-y-8">
             <div className="bg-background rounded-xl shadow-md p-4 sm:p-6 border border-brandColor1/50">
@@ -198,11 +273,11 @@ export default function PumpDetailsPage() {
                   <p className="text-base font-medium text-foreground">{pump.maxSpeed} RPM</p>
                 </div>
                 <div>
-                  <h3 className="text-xs font-medium text-foreground/70 mb-0.5 uppercase tracking-wider">Efficiency</h3>
+                  <h3 className="text-xs font-medium text-foreground/70 mb-0.5 uppercase tracking-wider">Type</h3>
                   <p className="text-base font-medium text-foreground">{pump.type.replace('_', ' ')}</p>
                 </div>
                 <div>
-                  <h3 className="text-xs font-medium text-foreground/70 mb-0.5 uppercase tracking-wider">NPSH</h3>
+                  <h3 className="text-xs font-medium text-foreground/70 mb-0.5 uppercase tracking-wider">Model</h3>
                   <p className="text-base font-medium text-foreground">{pump.manufacturer} - {pump.modelNumber}</p>
                 </div>
               </div>
@@ -227,12 +302,11 @@ export default function PumpDetailsPage() {
               onEdit={handleEditCurve}
               onDelete={handleDeleteCurve}
             />
-            {/* Show AffinityCalculator only if pump data is available and there's at least one original (non-scaled) curve */}
             {pump && curves.some(c => !c.isScaled) && (
               <div className="bg-background rounded-xl shadow-md p-4 sm:p-6 border border-brandColor1/50">
                 <h2 className="text-xl font-semibold text-foreground/90 mb-4">Scale Curve</h2>
                 <AffinityCalculator
-                  curves={curves} // Pass all curves; AffinityCalculator filters internally for selection
+                  curves={curves}
                   pumpModelId={pump.id}
                   onScaledCurveCreated={handleNewScaledCurve}
                 />
@@ -240,7 +314,53 @@ export default function PumpDetailsPage() {
             )}
           </div>
         </div>
+
+        {/* Bill of Materials Section */}
+        <div className="mt-12 pt-8 border-t border-brandColor2">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-3xl font-bold text-foreground">Bill of Materials</h2>
+            <button
+              onClick={() => handleAddBOMItemClick(null)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            >
+              Add Top-Level BOM Item
+            </button>
+          </div>
+
+          {/* Conditional Forms Display */}
+          {showAddBOMForm && (
+            <div className="mb-8 p-4 bg-background rounded-xl shadow-md border border-brandColor1/50">
+              <AddBOMItemForm
+                pumpId={pump.id}
+                parentId={currentBOMParentId}
+                onBOMItemAdded={handleBOMFormSuccess}
+                onCancel={handleBOMFormCancel}
+              />
+            </div>
+          )}
+
+          {editingBOMItem && (
+            <div className="mb-8 p-4 bg-background rounded-xl shadow-md border border-brandColor1/50">
+              <EditBOMItemForm
+                initialData={editingBOMItem}
+                onBOMItemUpdated={handleBOMFormSuccess}
+                onCancel={handleBOMFormCancel}
+              />
+            </div>
+          )}
+          
+          {/* Nested BOM View */}
+          <div className="bg-background rounded-xl shadow-md p-4 sm:p-6 border border-brandColor1/50">
+            <NestedBOMView
+              pumpId={pump.id}
+              bomUpdateKey={bomUpdateKey}
+              onEditItem={handleEditBOMItemClick}
+              onAddItem={handleAddBOMItemClick}
+              onDeleteItem={handleDeleteBOMItem}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
-} 
+}

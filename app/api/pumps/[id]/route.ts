@@ -13,7 +13,7 @@ export async function GET(
       include: {
         curves: true,
         documents: true,
-        bom: true,
+        bomItems: true, // Renamed from bom to bomItems
       },
     });
 
