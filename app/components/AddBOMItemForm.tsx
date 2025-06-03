@@ -12,9 +12,10 @@ interface AddBOMItemFormProps {
   pumpId: number;
   parentId?: number | null;
   onBOMItemAdded: () => void; // Callback to refresh BOM list
+  onCancel?: () => void; // ADD THIS LINE
 }
 
-const AddBOMItemForm: React.FC<AddBOMItemFormProps> = ({ pumpId, parentId, onBOMItemAdded }) => {
+const AddBOMItemForm: React.FC<AddBOMItemFormProps> = ({ pumpId, parentId, onBOMItemAdded, onCancel }) => {
   const [partNumber, setPartNumber] = useState('');
   const [description, setDescription] = useState('');
   const [quantity, setQuantity] = useState<number | string>(''); // Allow string for input flexibility
@@ -214,8 +215,19 @@ const AddBOMItemForm: React.FC<AddBOMItemFormProps> = ({ pumpId, parentId, onBOM
         </button>
       </div>
 
-      <div className="flex justify-end pt-4">
-        <button type="submit" disabled={isLoading} className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 disabled:opacity-50">
+      <div className="flex justify-end space-x-3 pt-4"> {/* Added space-x-3 for button spacing */}
+        <button 
+          type="button" 
+          onClick={onCancel} 
+          className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+        >
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          disabled={isLoading} 
+          className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 disabled:opacity-50"
+        >
           {isLoading ? 'Adding...' : (parentId ? 'Add Sub-Item' : 'Add BOM Item')}
         </button>
       </div>
