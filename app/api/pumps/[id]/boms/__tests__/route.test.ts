@@ -8,9 +8,9 @@ jest.mock('next/server', () => ({
   },
 }));
 
-describe('/api/pumps/[pumpId]/boms', () => {
-  const pumpId = '1';
-  const pumpIdInt = parseInt(pumpId, 10);
+describe('/api/pumps/[id]/boms', () => {
+  const id = '1';
+  const idInt = parseInt(id, 10);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -18,43 +18,43 @@ describe('/api/pumps/[pumpId]/boms', () => {
 
   describe('POST', () => {
     it('should create a new BOM and return 201', async () => {
-      const mockPump = { id: pumpIdInt, name: 'Test Pump' };
-      const mockBOM = { id: 1, name: 'New BOM Name', pumpModelId: pumpIdInt, items: [], customFields: [] };
+      const mockPump = { id: idInt, name: 'Test Pump' };
+      const mockBOM = { id: 1, name: 'New BOM Name', pumpModelId: idInt, items: [], customFields: [] };
       const requestBody = { name: 'New BOM Name' };
 
       prismaMock.pumpModel.findUnique.mockResolvedValue(mockPump);
       prismaMock.bOM.create.mockResolvedValue(mockBOM);
 
-      const request = new Request(`http://localhost/api/pumps/${pumpId}/boms`, {
+      const request = new Request(`http://localhost/api/pumps/${id}/boms`, {
         method: 'POST',
         body: JSON.stringify(requestBody),
       });
 
-      const response = await POST(request, { params: { pumpId } });
+      const response = await POST(request, { params: { id } });
 
-      expect(prismaMock.pumpModel.findUnique).toHaveBeenCalledWith({ where: { id: pumpIdInt } });
+      expect(prismaMock.pumpModel.findUnique).toHaveBeenCalledWith({ where: { id: idInt } });
       expect(prismaMock.bOM.create).toHaveBeenCalledWith({
-        data: { name: requestBody.name, pumpModelId: pumpIdInt },
+        data: { name: requestBody.name, pumpModelId: idInt },
       });
       expect(NextResponse.json).toHaveBeenCalledWith(mockBOM, { status: 201 });
     });
 
     it('should return 400 if name is missing', async () => {
-      const request = new Request(`http://localhost/api/pumps/${pumpId}/boms`, {
+      const request = new Request(`http://localhost/api/pumps/${id}/boms`, {
         method: 'POST',
         body: JSON.stringify({}), // Missing name
       });
-      await POST(request, { params: { pumpId } });
+      await POST(request, { params: { id } });
       expect(NextResponse.json).toHaveBeenCalledWith({ error: 'BOM name is required' }, { status: 400 });
     });
 
     it('should return 404 if pump not found', async () => {
       prismaMock.pumpModel.findUnique.mockResolvedValue(null);
-      const request = new Request(`http://localhost/api/pumps/${pumpId}/boms`, {
+      const request = new Request(`http://localhost/api/pumps/${id}/boms`, {
         method: 'POST',
         body: JSON.stringify({ name: 'Test BOM' }),
       });
-      await POST(request, { params: { pumpId } });
+      await POST(request, { params: { id } });
       expect(NextResponse.json).toHaveBeenCalledWith({ error: 'Pump not found' }, { status: 404 });
     });
      it('should return 400 if pumpId is invalid', async () => {
@@ -62,27 +62,27 @@ describe('/api/pumps/[pumpId]/boms', () => {
         method: 'POST',
         body: JSON.stringify({ name: 'Test BOM' }),
       });
-      await POST(request, { params: { pumpId: 'invalid' } });
+      await POST(request, { params: { id: 'invalid' } });
       expect(NextResponse.json).toHaveBeenCalledWith({ error: 'Invalid Pump ID' }, { status: 400 });
     });
   });
 
   describe('GET', () => {
     it('should return a list of BOMs for a pump and status 200', async () => {
-      const mockPump = { id: pumpIdInt, name: 'Test Pump' };
+      const mockPump = { id: idInt, name: 'Test Pump' };
       const mockBOMs = [
-        { id: 1, name: 'BOM A', pumpModelId: pumpIdInt },
-        { id: 2, name: 'BOM B', pumpModelId: pumpIdInt },
+        { id: 1, name: 'BOM A', pumpModelId: idInt },
+        { id: 2, name: 'BOM B', pumpModelId: idInt },
       ];
       prismaMock.pumpModel.findUnique.mockResolvedValue(mockPump);
       prismaMock.bOM.findMany.mockResolvedValue(mockBOMs);
 
-      const request = new Request(`http://localhost/api/pumps/${pumpId}/boms`);
-      const response = await GET(request, { params: { pumpId } });
+      const request = new Request(`http://localhost/api/pumps/${id}/boms`);
+      const response = await GET(request, { params: { id } });
 
-      expect(prismaMock.pumpModel.findUnique).toHaveBeenCalledWith({ where: { id: pumpIdInt } });
+      expect(prismaMock.pumpModel.findUnique).toHaveBeenCalledWith({ where: { id: idInt } });
       expect(prismaMock.bOM.findMany).toHaveBeenCalledWith({
-        where: { pumpModelId: pumpIdInt },
+        where: { pumpModelId: idInt },
         orderBy: { createdAt: 'desc' },
       });
       expect(NextResponse.json).toHaveBeenCalledWith(mockBOMs);
@@ -91,26 +91,26 @@ describe('/api/pumps/[pumpId]/boms', () => {
     });
 
     it('should return an empty list if no BOMs found and status 200', async () => {
-      const mockPump = { id: pumpIdInt, name: 'Test Pump' };
+      const mockPump = { id: idInt, name: 'Test Pump' };
       prismaMock.pumpModel.findUnique.mockResolvedValue(mockPump);
       prismaMock.bOM.findMany.mockResolvedValue([]);
       
-      const request = new Request(`http://localhost/api/pumps/${pumpId}/boms`);
-      await GET(request, { params: { pumpId } });
+      const request = new Request(`http://localhost/api/pumps/${id}/boms`);
+      await GET(request, { params: { id } });
       
       expect(NextResponse.json).toHaveBeenCalledWith([]);
     });
 
     it('should return 404 if pump not found', async () => {
       prismaMock.pumpModel.findUnique.mockResolvedValue(null);
-      const request = new Request(`http://localhost/api/pumps/${pumpId}/boms`);
-      await GET(request, { params: { pumpId } });
+      const request = new Request(`http://localhost/api/pumps/${id}/boms`);
+      await GET(request, { params: { id } });
       expect(NextResponse.json).toHaveBeenCalledWith({ error: 'Pump not found' }, { status: 404 });
     });
 
     it('should return 400 if pumpId is invalid', async () => {
       const request = new Request(`http://localhost/api/pumps/invalid/boms`);
-      await GET(request, { params: { pumpId: 'invalid' } });
+      await GET(request, { params: { id: 'invalid' } });
       expect(NextResponse.json).toHaveBeenCalledWith({ error: 'Invalid Pump ID' }, { status: 400 });
     });
   });

@@ -1,27 +1,27 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-// POST /api/pumps/[pumpId]/boms - Create a new BOM for a pump
+// POST /api/pumps/[id]/boms - Create a new BOM for a pump
 export async function POST(
   request: Request,
-  { params }: { params: { pumpId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { pumpId } = params;
+    const { id } = params;
     const { name } = await request.json();
 
     if (!name) {
       return NextResponse.json({ error: 'BOM name is required' }, { status: 400 });
     }
 
-    const pumpIdInt = parseInt(pumpId, 10);
-    if (isNaN(pumpIdInt)) {
+    const idInt = parseInt(id, 10);
+    if (isNaN(idInt)) {
       return NextResponse.json({ error: 'Invalid Pump ID' }, { status: 400 });
     }
 
     // Check if pump exists
     const pump = await prisma.pumpModel.findUnique({
-      where: { id: pumpIdInt },
+      where: { id: idInt },
     });
 
     if (!pump) {
@@ -31,7 +31,7 @@ export async function POST(
     const newBOM = await prisma.bOM.create({
       data: {
         name,
-        pumpModelId: pumpIdInt,
+        pumpModelId: idInt,
       },
     });
 
@@ -42,23 +42,23 @@ export async function POST(
   }
 }
 
-// GET /api/pumps/[pumpId]/boms - List all BOMs for a pump
+// GET /api/pumps/[id]/boms - List all BOMs for a pump
 export async function GET(
   request: Request,
-  { params }: { params: { pumpId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { pumpId } = params;
-    const pumpIdInt = parseInt(pumpId, 10);
+    const { id } = params;
+    const idInt = parseInt(id, 10);
 
-    if (isNaN(pumpIdInt)) {
+    if (isNaN(idInt)) {
       return NextResponse.json({ error: 'Invalid Pump ID' }, { status: 400 });
     }
 
     // Optional: Check if pump exists before fetching BOMs, though not strictly necessary
     // if you only want to return an empty array for non-existent/invalid pumpId.
     const pump = await prisma.pumpModel.findUnique({
-      where: { id: pumpIdInt },
+      where: { id: idInt },
     });
 
     if (!pump) {
@@ -68,7 +68,7 @@ export async function GET(
 
     const boms = await prisma.bOM.findMany({
       where: {
-        pumpModelId: pumpIdInt,
+        pumpModelId: idInt,
       },
       orderBy: {
         createdAt: 'desc', // Optional: order by creation date

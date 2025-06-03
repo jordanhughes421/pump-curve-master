@@ -13,9 +13,9 @@ export interface BOMItemCustomField {
   id: number;
   name: string;
   value: string;
-  bomItemId: number;
-  createdAt: string;
-  updatedAt: string;
+  bomItemId?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Corresponds to Prisma's BOMItem model
