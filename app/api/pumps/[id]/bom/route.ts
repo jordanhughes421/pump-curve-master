@@ -91,9 +91,9 @@ export async function POST(
     }
 
     const data = await request.json();
-    const { partNumber, description, quantity, unit, supplier, parentId } = data;
+    const { partNumber, description, quantity, unit, supplier, parentId, bomId } = data;
 
-    if (!partNumber || !description || quantity === undefined || !unit) {
+    if (!partNumber || !description || quantity === undefined || !unit || bomId === undefined) {
       return NextResponse.json(
         { error: 'Missing required BOM item fields' },
         { status: 400 }
@@ -123,7 +123,7 @@ export async function POST(
         quantity: parseInt(quantity),
         unit,
         supplier: supplier || null,
-        pumpModelId: idInt, // Associate with the pump
+        bomId: parseInt(bomId), // Added
         parentId: parentId ? parseInt(parentId) : null, // Associate with parent if provided
       },
       include: {
