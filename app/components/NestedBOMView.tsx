@@ -56,7 +56,7 @@ const BOMTreeItem: React.FC<BOMTreeItemProps> = ({ item, level, onEditItem, onAd
   };
 
   return (
-    <div className="my-3 p-4 border border-gray-200 rounded-lg shadow-sm bg-white" style={indentStyle}>
+    <div className="my-3 p-4 border border-[var(--brandColor1)] rounded-xl shadow bg-[var(--color-content-background)]" style={indentStyle}>
       <div className="flex justify-between items-start">
         <div>
           <div className="font-semibold text-lg text-blue-700">
@@ -68,16 +68,16 @@ const BOMTreeItem: React.FC<BOMTreeItemProps> = ({ item, level, onEditItem, onAd
           </div>
         </div>
         <div className="flex space-x-2 flex-shrink-0 ml-4">
-          <button onClick={() => onEditItem(item)} className="px-2 py-1 text-xs bg-yellow-500 text-white rounded hover:bg-yellow-600">Edit</button>
-          <button onClick={() => onAddItem(item.id)} className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600">Add Child</button>
-          <button onClick={handleDelete} className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600">Delete</button>
+          <button onClick={() => onEditItem(item)} className="px-2 py-1 text-xs bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors duration-150 ease-in-out">Edit</button>
+          <button onClick={() => onAddItem(item.id)} className="px-2 py-1 text-xs bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-150 ease-in-out">Add Child</button>
+          <button onClick={handleDelete} className="px-2 py-1 text-xs bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-150 ease-in-out">Delete</button>
         </div>
       </div>
 
       {item.customFields && item.customFields.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-gray-200">
+        <div className="mt-3 pt-3 border-t border-gray-300">
           <h4 className="text-sm font-semibold text-gray-800 mb-1">Custom Fields:</h4>
-          <ul className="list-disc list-inside pl-2 text-xs text-gray-600 space-y-0.5">
+          <ul className="list-disc list-inside pl-2 text-xs text-gray-600 space-y-1">
             {item.customFields.map((field) => (
               <li key={field.id}>
                 <span className="font-medium">{field.name}:</span> {field.value}
@@ -88,7 +88,7 @@ const BOMTreeItem: React.FC<BOMTreeItemProps> = ({ item, level, onEditItem, onAd
       )}
 
       {item.children && item.children.length > 0 && (
-        <div className="mt-4 pt-2 pl-4 border-l-2 border-blue-200">
+        <div className="mt-4 pt-2 pl-4 border-l-2 border-gray-300">
           {item.children.map((child) => (
             <BOMTreeItem 
               key={child.id} 
@@ -142,7 +142,7 @@ const NestedBOMView: React.FC<NestedBOMViewProps> = ({ pumpId, bomUpdateKey, onE
   if (isLoading) {
     return (
       <div className="flex justify-center items-center p-10">
-        <div className="animate-spin inline-block w-8 h-8 border-4 rounded-full border-blue-500 border-t-transparent" role="status">
+        <div className="animate-spin inline-block w-8 h-8 border-4 rounded-full border-[var(--brandColor4)] border-t-transparent" role="status">
           <span className="sr-only">Loading...</span> {/* Use sr-only for Tailwind */}
         </div>
         <p className="ml-3 text-gray-700">Loading Bill of Materials...</p>
@@ -157,7 +157,7 @@ const NestedBOMView: React.FC<NestedBOMViewProps> = ({ pumpId, bomUpdateKey, onE
         <p>{error}</p>
         <button 
           onClick={fetchBOMData} 
-          className="mt-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+          className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 text-sm transition-colors duration-150 ease-in-out"
         >
           Retry
         </button>
@@ -175,7 +175,7 @@ const NestedBOMView: React.FC<NestedBOMViewProps> = ({ pumpId, bomUpdateKey, onE
   }
 
   return (
-    <div className="p-4 bg-gray-50 min-h-screen">
+    <div data-testid="nested-bom-view" className="p-4 bg-[var(--color-background)] min-h-screen">
       {/* Title is handled by parent page now */}
       {/* <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Bill of Materials for Pump ID: {pumpId}</h2> */}
       {bomData.map((item) => (

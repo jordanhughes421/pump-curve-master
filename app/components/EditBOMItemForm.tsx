@@ -177,7 +177,7 @@ const EditBOMItemForm: React.FC<EditBOMItemFormProps> = ({ initialData, onBOMIte
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 bg-white shadow-lg rounded-lg space-y-6 border border-gray-300">
+    <form data-testid="edit-bom-item-form" onSubmit={handleSubmit} className="p-6 bg-[var(--color-content-background)] shadow-md rounded-xl space-y-6 border border-[var(--brandColor1)]">
       <h3 className="text-xl font-semibold text-gray-800">Edit BOM Item: {initialData.partNumber}</h3>
 
       {error && <div className="p-3 bg-red-100 text-red-700 border border-red-300 rounded-md whitespace-pre-line">{error}</div>}
@@ -187,40 +187,40 @@ const EditBOMItemForm: React.FC<EditBOMItemFormProps> = ({ initialData, onBOMIte
         {/* Standard Fields */}
         <div>
           <label htmlFor="partNumber" className="block text-sm font-medium text-gray-700 mb-1">Part Number <span className="text-red-500">*</span></label>
-          <input type="text" id="partNumber" value={partNumber} onChange={e => setPartNumber(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
+          <input type="text" id="partNumber" value={partNumber} onChange={e => setPartNumber(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 focus:border-transparent"/>
         </div>
         <div>
           <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description <span className="text-red-500">*</span></label>
-          <input type="text" id="description" value={description} onChange={e => setDescription(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
+          <input type="text" id="description" value={description} onChange={e => setDescription(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 focus:border-transparent"/>
         </div>
         <div>
           <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">Quantity <span className="text-red-500">*</span></label>
-          <input type="number" id="quantity" value={quantity} onChange={e => setQuantity(e.target.value === '' ? '' : Number(e.target.value))} required className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
+          <input type="number" id="quantity" value={quantity} onChange={e => setQuantity(e.target.value === '' ? '' : Number(e.target.value))} required className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 focus:border-transparent"/>
         </div>
         <div>
           <label htmlFor="unit" className="block text-sm font-medium text-gray-700 mb-1">Unit <span className="text-red-500">*</span></label>
-          <input type="text" id="unit" value={unit} onChange={e => setUnit(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
+          <input type="text" id="unit" value={unit} onChange={e => setUnit(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 focus:border-transparent"/>
         </div>
         <div className="md:col-span-2">
           <label htmlFor="supplier" className="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
-          <input type="text" id="supplier" value={supplier} onChange={e => setSupplier(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
+          <input type="text" id="supplier" value={supplier} onChange={e => setSupplier(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 focus:border-transparent"/>
         </div>
       </div>
 
       {/* Custom Fields Section */}
       <div className="pt-4 border-t">
-        <h4 className="text-md font-semibold text-gray-700 mb-2">Custom Fields</h4>
+        <h4 className="text-lg font-semibold text-gray-700 mb-3">Custom Fields</h4>
         {customFields.filter(field => field.status !== 'deleted' || !field.localId.startsWith('new-')).map((field) => ( 
           // Do not render 'new' fields that were marked 'deleted'.
           // Render 'existing' fields marked 'deleted' so user sees them as "to be deleted", or style them differently.
           // For simplicity here, we'll just show them, maybe with a strikethrough if status is 'deleted'.
-          <div key={field.localId} className={`flex items-center space-x-2 mb-3 p-3 border rounded-md ${field.status === 'deleted' ? 'bg-red-50 opacity-70' : 'bg-gray-50'}`}>
+          <div key={field.localId} className={`flex items-center space-x-2 mb-3 p-3 border border-[var(--brandColor2)] rounded-md ${field.status === 'deleted' ? 'bg-red-50 opacity-70' : 'bg-[var(--brandColor1-light)]'}`}>
             <input 
               type="text" 
               placeholder="Field Name" 
               value={field.name} 
               onChange={e => handleCustomFieldChange(field.localId, 'name', e.target.value)} 
-              className={`w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm text-sm ${field.status === 'deleted' ? 'line-through' : ''}`}
+              className={`w-full px-2 py-1 border border-gray-300 rounded-md shadow-xs text-sm focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 focus:border-transparent ${field.status === 'deleted' ? 'line-through' : ''}`}
               disabled={field.status === 'deleted'}
             />
             <input 
@@ -228,30 +228,30 @@ const EditBOMItemForm: React.FC<EditBOMItemFormProps> = ({ initialData, onBOMIte
               placeholder="Field Value" 
               value={field.value} 
               onChange={e => handleCustomFieldChange(field.localId, 'value', e.target.value)} 
-              className={`w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm text-sm ${field.status === 'deleted' ? 'line-through' : ''}`}
+              className={`w-full px-2 py-1 border border-gray-300 rounded-md shadow-xs text-sm focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 focus:border-transparent ${field.status === 'deleted' ? 'line-through' : ''}`}
               disabled={field.status === 'deleted'}
             />
             <button 
               type="button" 
               onClick={() => handleRemoveOrMarkCustomField(field.localId)} 
-              className={`px-3 py-1 text-white rounded-md text-sm ${field.status === 'deleted' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-red-500 hover:bg-red-600'}`}
+              className={`px-3 py-1 text-white rounded-md text-sm transition-colors duration-150 ease-in-out ${field.status === 'deleted' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-red-500 hover:bg-red-600'}`}
               disabled={field.status === 'deleted' && field.localId.startsWith('new-')} // Should not happen due to filter
             >
               {field.status === 'deleted' && field.localId.startsWith('existing-') ? 'Undo' : 'Delete'}
             </button>
           </div>
         ))}
-        <button type="button" onClick={handleAddCustomField} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm">
+        <button type="button" onClick={handleAddCustomField} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm transition-colors duration-150 ease-in-out">
           Add New Custom Field
         </button>
       </div>
 
       {/* Action Buttons */}
       <div className="flex justify-end space-x-3 pt-4">
-        <button type="button" onClick={onCancel} className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+        <button type="button" onClick={onCancel} className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-150 ease-in-out">
           Cancel
         </button>
-        <button type="submit" disabled={isLoading} className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 disabled:opacity-50">
+        <button type="submit" disabled={isLoading} className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-green-500 disabled:opacity-50 transition-colors duration-150 ease-in-out">
           {isLoading ? 'Updating...' : 'Save Changes'}
         </button>
       </div>
