@@ -129,7 +129,7 @@ const BOMHeaderDisplay: React.FC<BOMHeaderDisplayProps> = ({ bom, onDataChange }
 
 
   return (
-    <div className="p-4 md:p-6 bg-content-background rounded-lg shadow border border-gray-200 dark:border-gray-700 mt-4">
+    <div className="p-4 md:p-6 bg-content-background text-foreground rounded-lg shadow border border-gray-200 dark:border-zinc-700 mt-4">
       <h3 className="text-xl font-semibold text-foreground mb-2">BOM Details: {bom.name}</h3>
       <p className="text-sm text-foreground/90 mb-1"><strong>ID:</strong> {bom.id}</p>
       <p className="text-sm text-foreground/90 mb-1"><strong>Created At:</strong> {new Date(bom.createdAt).toLocaleString()}</p>
@@ -153,7 +153,7 @@ const BOMHeaderDisplay: React.FC<BOMHeaderDisplayProps> = ({ bom, onDataChange }
             value={newFieldName}
             onChange={(e) => setNewFieldName(e.target.value)}
             disabled={isLoading}
-            className="w-full sm:w-1/2 px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm mr-0 sm:mr-2 mb-2 sm:mb-0"
+            className="w-full sm:w-1/2 px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground dark:placeholder-foreground/60 placeholder-foreground/50 text-sm mr-0 sm:mr-2 mb-2 sm:mb-0"
           />
           <input
             type="text"
@@ -161,13 +161,13 @@ const BOMHeaderDisplay: React.FC<BOMHeaderDisplayProps> = ({ bom, onDataChange }
             value={newFieldValue}
             onChange={(e) => setNewFieldValue(e.target.value)}
             disabled={isLoading}
-            className="w-full sm:w-1/2 px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm mr-0 sm:mr-2 mb-2 sm:mb-0"
+            className="w-full sm:w-1/2 px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground dark:placeholder-foreground/60 placeholder-foreground/50 text-sm mr-0 sm:mr-2 mb-2 sm:mb-0"
           />
         </div>
         <button
           type="submit"
           disabled={isLoading}
-          className="px-4 py-2.5 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brandColor3 hover:bg-brandColor4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandColor3 dark:focus:ring-offset-background transition-colors disabled:opacity-60"
+          className="px-4 py-2.5 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brandColor3 hover:bg-brandColor4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandColor3 dark:bg-brandColor5 dark:hover:bg-brandColor4 dark:text-background dark:focus:ring-offset-background transition-colors disabled:opacity-60"
         >
           {isLoading ? 'Adding...' : 'Add Field'}
         </button>
@@ -177,7 +177,7 @@ const BOMHeaderDisplay: React.FC<BOMHeaderDisplayProps> = ({ bom, onDataChange }
       {customFields && customFields.length > 0 ? (
         <ul className="list-none p-0 space-y-3">
           {customFields.map((field) => (
-            <li key={field.id} className="p-3 border border-brandColor1/30 rounded-md bg-background dark:bg-zinc-800 shadow-sm">
+            <li key={field.id} className="p-3 border border-brandColor1/30 rounded-md bg-background dark:bg-zinc-800 dark:border-zinc-700 dark:hover:bg-zinc-700 dark:text-foreground shadow-sm">
               {editingField && editingField.id === field.id ? (
                 <form onSubmit={handleSaveEditCustomField}>
                   <div className="flex items-center mb-2">
@@ -186,14 +186,14 @@ const BOMHeaderDisplay: React.FC<BOMHeaderDisplayProps> = ({ bom, onDataChange }
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       disabled={isLoading}
-                      className="w-1/3 px-2 py-1.5 bg-background border border-brandColor1/50 rounded-md focus:outline-none focus:ring-1 focus:ring-brandColor2 dark:bg-zinc-700 text-foreground placeholder-foreground/50 text-sm mr-2"
+                      className="w-1/3 px-2 py-1.5 bg-background border border-brandColor1/50 rounded-md focus:outline-none focus:ring-1 focus:ring-brandColor2 dark:bg-zinc-700 text-foreground dark:placeholder-foreground/60 placeholder-foreground/50 text-sm mr-2"
                     />
                     <input
                       type="text"
                       value={editValue}
                       onChange={(e) => setEditValue(e.target.value)}
                       disabled={isLoading}
-                      className="w-2/3 px-2 py-1.5 bg-background border border-brandColor1/50 rounded-md focus:outline-none focus:ring-1 focus:ring-brandColor2 dark:bg-zinc-700 text-foreground placeholder-foreground/50 text-sm mr-2"
+                      className="w-2/3 px-2 py-1.5 bg-background border border-brandColor1/50 rounded-md focus:outline-none focus:ring-1 focus:ring-brandColor2 dark:bg-zinc-700 text-foreground dark:placeholder-foreground/60 placeholder-foreground/50 text-sm mr-2"
                     />
                   </div>
                   <button
@@ -214,21 +214,21 @@ const BOMHeaderDisplay: React.FC<BOMHeaderDisplayProps> = ({ bom, onDataChange }
                 </form>
               ) : (
                 <div className="flex justify-between items-center">
-                  <div className="text-sm text-foreground"> {/* Ensure text styling */}
+                  <div className="text-sm text-foreground dark:text-foreground">
                     <strong>{field.name}:</strong> {field.value}
                   </div>
                   <div>
                     <button
                       onClick={() => handleEditField(field)}
                       disabled={isLoading}
-                      className="px-3 py-1.5 border border-brandColor2/70 text-foreground/90 rounded-md hover:bg-brandColor1/20 focus:outline-none focus:ring-1 focus:ring-brandColor2 transition-colors text-xs font-medium mr-2 disabled:opacity-50"
+                      className="px-3 py-1.5 border border-brandColor2/70 text-foreground/90 rounded-md hover:bg-brandColor1/20 focus:outline-none focus:ring-1 focus:ring-brandColor2 dark:text-foreground/90 dark:border-zinc-600 dark:hover:bg-zinc-700 transition-colors text-xs font-medium mr-2 disabled:opacity-50"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeleteCustomField(field.id)}
                       disabled={isLoading}
-                      className="px-3 py-1.5 border border-red-500/70 text-red-600 dark:text-red-400 hover:bg-red-500/10 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 transition-colors text-xs font-medium disabled:opacity-50"
+                      className="px-3 py-1.5 border border-red-500/70 text-red-600 dark:text-red-400 hover:bg-red-500/10 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 dark:border-red-500/70 dark:hover:bg-red-500/20 transition-colors text-xs font-medium disabled:opacity-50"
                     >
                       Delete
                     </button>
