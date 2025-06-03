@@ -157,59 +157,99 @@ const BOMListManager: React.FC<BOMListManagerProps> = ({ pumpId, onSelectBOM, se
     }
   };
 
-  if (isLoading && boms.length === 0 && !error) return <p>Loading BOMs...</p>; // Show loading only if no boms and no initial error
-  if (error) return <p className="text-red-500">Error loading BOMs: {error}</p>; // Show initial load error prominently
+  // General status messages styling
+  // Show loading only if no boms and no initial error
+  if (isLoading && boms.length === 0 && !error) return <p className="text-sm text-foreground/70 mt-4">Loading BOMs...</p>;
+  // Show initial load error prominently
+  if (error) return <p className="bg-red-50 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm my-4">Error loading BOMs: {error}</p>;
 
   return (
-    <div style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
-      <h4>Bill of Materials Management</h4>
+    <div className="p-4 md:p-6 bg-content-background rounded-lg shadow border border-gray-200 dark:border-gray-700 mb-6">
+      <h4 className="text-xl font-semibold text-foreground mb-4">Bill of Materials Management</h4>
       
-      {actionError && <p style={{ color: 'red', margin: '10px 0' }}>Action Error: {actionError}</p>}
+      {actionError && (
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm my-4">
+          Action Error: {actionError}
+        </div>
+      )}
 
-      <form onSubmit={handleCreateBOM} style={{ marginBottom: '15px', paddingBottom: '10px', borderBottom: '1px solid #ddd' }}>
+      <form onSubmit={handleCreateBOM} className="mb-6 pb-4 border-b border-brandColor1/50">
         <input
           type="text"
           value={newBomName}
           onChange={(e) => setNewBomName(e.target.value)}
           placeholder="New BOM Name"
           disabled={isCreating || isLoading}
-          style={{ marginRight: '5px', padding: '5px' }}
+          className="w-full sm:w-auto px-3 py-2.5 bg-background border border-brandColor1/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandColor2 dark:bg-zinc-800 text-foreground placeholder-foreground/50 text-sm mr-2 mb-2 sm:mb-0"
         />
-        <button type="submit" disabled={isCreating || isLoading} style={{ padding: '5px 10px' }}>
+        <button
+          type="submit"
+          disabled={isCreating || isLoading}
+          className="px-4 py-2.5 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brandColor3 hover:bg-brandColor4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandColor3 dark:focus:ring-offset-background transition-colors disabled:opacity-60"
+        >
           {isCreating ? 'Creating...' : 'Create New BOM'}
         </button>
       </form>
 
-      {boms.length === 0 && !isLoading && <p>No BOMs found for this pump. Create one above.</p>}
+      {/* Loading/Status Messages: consistent styling */}
+      {boms.length === 0 && !isLoading && <p className="text-sm text-foreground/70 mt-4">No BOMs found for this pump. Create one above.</p>}
       
       {boms.length > 0 && (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+        <ul className="list-none p-0 space-y-2">
           {boms.map((bom) => (
-            <li key={bom.id} style={{ marginBottom: '5px', padding: '5px', border: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <li
+              key={bom.id}
+              className="p-3 border border-brandColor1/30 rounded-md flex justify-between items-center hover:bg-brandColor1/10 transition-colors"
+            >
               {editingBomId === bom.id ? (
-                <form onSubmit={handleSaveBomName} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                <form onSubmit={handleSaveBomName} className="flex items-center w-full">
                   <input 
                     type="text" 
                     value={editingBomName} 
                     onChange={(e) => setEditingBomName(e.target.value)}
                     disabled={isLoading} 
-                    style={{ flexGrow: 1, marginRight: '5px', padding: '3px' }}
+                    className="flex-grow px-2 py-1.5 bg-background border border-brandColor1/50 rounded-md focus:outline-none focus:ring-1 focus:ring-brandColor2 dark:bg-zinc-700 text-foreground placeholder-foreground/50 text-sm mr-2"
                     autoFocus
                   />
-                  <button type="submit" disabled={isLoading} style={{ padding: '3px 7px', marginRight: '5px', backgroundColor: 'lightgreen' }}>Save</button>
-                  <button type="button" onClick={handleCancelEdit} disabled={isLoading} style={{ padding: '3px 7px', backgroundColor: 'lightcoral' }}>Cancel</button>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-green-500 mr-2 disabled:opacity-50"
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    disabled={isLoading}
+                    className="px-3 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-400 disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
                 </form>
               ) : (
                 <>
                   <span 
                     onClick={() => onSelectBOM(bom.id.toString())} 
-                    style={{ cursor: 'pointer', fontWeight: selectedBomId === bom.id.toString() ? 'bold' : 'normal' }}
+                    className={`cursor-pointer ${selectedBomId === bom.id.toString() ? 'font-bold' : 'font-normal'}`}
                   >
                     {bom.name} (ID: {bom.id})
                   </span>
                   <div>
-                    <button onClick={() => handleEditBom(bom)} disabled={isLoading} style={{ marginRight: '5px', padding: '3px 7px' }}>Edit</button>
-                    <button onClick={() => handleDeleteBom(bom.id)} disabled={isLoading} style={{ padding: '3px 7px', color: 'red' }}>Delete</button>
+                    <button
+                      onClick={() => handleEditBom(bom)}
+                      disabled={isLoading}
+                      className="px-3 py-1.5 border border-brandColor2/70 text-foreground/90 rounded-md hover:bg-brandColor1/20 focus:outline-none focus:ring-1 focus:ring-brandColor2 transition-colors text-xs font-medium mr-2 disabled:opacity-50"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteBom(bom.id)}
+                      disabled={isLoading}
+                      className="px-3 py-1.5 border border-red-500/70 text-red-600 dark:text-red-400 hover:bg-red-500/10 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 transition-colors text-xs font-medium disabled:opacity-50"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </>
               )}
@@ -217,7 +257,8 @@ const BOMListManager: React.FC<BOMListManagerProps> = ({ pumpId, onSelectBOM, se
           ))}
         </ul>
       )}
-      {isLoading && boms.length > 0 && <p>Processing...</p>} 
+      {/* Loading/Status Messages: consistent styling */}
+      {isLoading && boms.length > 0 && <p className="text-sm text-foreground/70 mt-4">Processing...</p>}
     </div>
   );
 };
