@@ -85,3 +85,17 @@ export interface CreateBOMResponse extends BOM {}
 export interface ApiError {
   error: string;
 }
+
+// In lib/types.ts (add or merge)
+export interface StandardPart {
+  id: number;
+  partNumber: string;
+  description: string;
+  defaultUnit: string;
+  defaultSupplier?: string | null;
+  parentId?: number | null;
+  children?: StandardPart[]; // For hierarchical data
+  createdAt: string; // Assuming ISO string from API
+  updatedAt: string; // Assuming ISO string from API
+  // Add any other fields that might come from the API, like bomItems count if added
+}

@@ -27,6 +27,8 @@ const EditBOMItemForm: React.FC<EditBOMItemFormProps> = ({ initialData, onBOMIte
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isSavingAsStandardPart, setIsSavingAsStandardPart] = useState(false);
+
 
   useEffect(() => {
     setPartNumber(initialData.partNumber);
@@ -163,9 +165,59 @@ const EditBOMItemForm: React.FC<EditBOMItemFormProps> = ({ initialData, onBOMIte
     }
   };
 
+  const handleSaveAsStandardPart = async () => {
+    setIsSavingAsStandardPart(true);
+    setError(null); // Clear previous errors
+    setSuccessMessage(null);
+
+    const standardPartData = {
+      partNumber: partNumber,
+      description: description,
+      defaultUnit: unit, // BOMItem 'unit' becomes StandardPart 'defaultUnit'
+      defaultSupplier: supplier || null,
+      // parentId is not set here, this creates a new top-level standard part.
+      // Could add a selector for parentId if needed.
+    };
+
+    try {
+      const response = await fetch('/api/standard-parts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(standardPartData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save as new Standard Part');
+      }
+      const newStandardPart = await response.json();
+      setSuccessMessage(`Item saved as new Standard Part: ${newStandardPart.partNumber} (ID: ${newStandardPart.id})`);
+      // Optionally, link this BOMItem to the new StandardPart by updating the BOMItem's standardPartId
+      // This would require another API call to PUT /api/bom-items/[initialData.id]
+      // For now, just creating the standard part.
+    } catch (err: any) {
+      setError(`Error saving as Standard Part: ${err.message}`);
+    } finally {
+      setIsSavingAsStandardPart(false);
+    }
+  };
+
+
   return (
     <form data-testid="edit-bom-item-form" onSubmit={handleSubmit} className="p-6 bg-background shadow-lg rounded-xl border border-brandColor1/50 dark:border-brandColor2/70 space-y-6">
-      <h3 className="text-xl font-semibold text-foreground">Edit BOM Item: {initialData.partNumber}</h3>
+      <div className="flex justify-between items-center">
+        <h3 className="text-xl font-semibold text-foreground">Edit BOM Item: {initialData.partNumber}</h3>
+        {!initialData.standardPartId && ( // Only show if not already linked to a standard part
+            <button
+            type="button"
+            onClick={handleSaveAsStandardPart}
+            disabled={isSavingAsStandardPart || isLoading}
+            className="px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+            >
+            {isSavingAsStandardPart ? 'Saving as SP...' : 'Save as New Standard Part'}
+            </button>
+        )}
+      </div>
 
       {error && <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg text-sm whitespace-pre-line">{error}</div>}
       {successMessage && <div className="p-3 bg-green-50 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 rounded-lg text-sm">{successMessage}</div>}
@@ -242,7 +294,11 @@ const EditBOMItemForm: React.FC<EditBOMItemFormProps> = ({ initialData, onBOMIte
         <button type="button" onClick={onCancel} className="px-6 py-2.5 border border-brandColor1/50 text-foreground/80 rounded-lg hover:bg-brandColor1/10 dark:hover:bg-brandColor1/20 focus:outline-none focus:ring-2 focus:ring-brandColor2 transition-colors text-sm font-medium">
           Cancel
         </button>
-        <button type="submit" disabled={isLoading} className="px-6 py-2.5 flex items-center justify-center border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brandColor3 hover:bg-brandColor4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandColor3 dark:focus:ring-offset-background transition-colors disabled:opacity-60">
+        <button
+            type="submit"
+            disabled={isLoading || isSavingAsStandardPart}
+            className="px-6 py-2.5 flex items-center justify-center border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brandColor3 hover:bg-brandColor4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandColor3 dark:focus:ring-offset-background transition-colors disabled:opacity-60"
+        >
           {isLoading ? 'Updating...' : 'Save Changes'}
         </button>
       </div>

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { detectCycle } from '@/app/utils/cycleDetection';
 
 // GET /api/bom-items/[id] - Retrieve a specific BOMItem
 export async function GET(
@@ -74,24 +75,24 @@ export async function PUT(
     
     // Validate parentId if provided
     if (parentId !== undefined) {
-        if (parentId !== null) {
-            const parentItem = await prisma.bOMItem.findUnique({ where: { id: parentId }});
-            if (!parentItem) {
-                 return NextResponse.json({ error: 'Parent BOMItem not found' }, { status: 400 });
-            }
-            // Ensure parent is not the item itself or one of its children (more complex check needed for full hierarchy protection)
-            if (parentItem.id === itemId) {
-                return NextResponse.json({ error: 'Cannot set item as its own parent' }, { status: 400 });
-            }
-            // You might also want to check if the parentItem belongs to the same BOM.
-            // This requires fetching the current item to get its bomId.
-            const currentItem = await prisma.bOMItem.findUnique({ where: { id: itemId }});
-            if (currentItem && parentItem.bomId !== currentItem.bomId) {
-                return NextResponse.json({ error: 'Parent BOMItem must belong to the same BOM' }, { status: 400 });
-            }
+      if (parentId !== null) {
+        // Check for cyclical dependency
+        const isCycle = await detectCycle(itemId, parentId, prisma.bOMItem);
+        if (isCycle) {
+          return NextResponse.json({ error: 'Cyclical dependency detected. Cannot set this parent.' }, { status: 400 });
         }
-    }
 
+        // Check if the parentItem belongs to the same BOM.
+        const currentItem = await prisma.bOMItem.findUnique({ where: { id: itemId } });
+        const parentItem = await prisma.bOMItem.findUnique({ where: { id: parentId } });
+        if (!parentItem) {
+          return NextResponse.json({ error: 'Parent BOMItem not found' }, { status: 400 });
+        }
+        if (currentItem && parentItem.bomId !== currentItem.bomId) {
+          return NextResponse.json({ error: 'Parent BOMItem must belong to the same BOM' }, { status: 400 });
+        }
+      }
+    }
 
     const updatedBOMItem = await prisma.bOMItem.update({
       where: { id: itemId },
@@ -139,23 +140,10 @@ export async function DELETE(
         return NextResponse.json({ error: 'BOMItem not found' }, { status: 404 });
     }
 
-    // If the BOMItem has children, you might want to prevent deletion or handle children (e.g., re-parent or delete them)
-    // For now, we'll assume that if a parent is deleted, its children might need to be handled.
-    // A simple check:
-    if (bomItem.children && bomItem.children.length > 0) {
-        // Option 1: Prevent deletion
-        // return NextResponse.json({ error: 'Cannot delete BOMItem with children. Please delete or re-assign children first.' }, { status: 400 });
-        // Option 2: Set children's parentId to null (if schema allows)
-        await prisma.bOMItem.updateMany({
-            where: { parentId: itemId },
-            data: { parentId: null },
-        });
-    }
-
-
     // Perform cascading delete within a transaction
     // 1. Delete BOMCustomFields associated with this BOMItem
     // 2. Delete the BOMItem itself
+    // Children are handled by `onDelete: Cascade` in the schema
     await prisma.$transaction(async (tx) => {
       await tx.bOMCustomField.deleteMany({
         where: { bomItemId: itemId },

@@ -139,9 +139,13 @@ model BOMItem {
 
   // Self-referencing relation for parent-child
   parentId     Int?
-  parent       BOMItem?         @relation("BOMItemChildren", fields: [parentId], references: [id])
+  parent       BOMItem? @relation("BOMItemChildren", fields: [parentId], references: [id], onDelete: Cascade)
   children     BOMItem[]        @relation("BOMItemChildren")
   customFields BOMCustomField[]
+
+  // StandardPart relation
+  standardPartId Int?
+  standardPart   StandardPart? @relation(fields: [standardPartId], references: [id], onDelete: Restrict) // Or SetNull if preferred when a StandardPart is deleted
 }
 
 model BOMCustomField {
@@ -152,4 +156,24 @@ model BOMCustomField {
   bomItem   BOMItem  @relation(fields: [bomItemId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model StandardPart {
+  id              Int            @id @default(autoincrement())
+  partNumber      String         @unique
+  description     String
+  defaultUnit     String
+  defaultSupplier String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Self-referencing relation for parent-child hierarchy
+  parentId        Int?
+  parent          StandardPart?  @relation("StandardPartChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children        StandardPart[] @relation("StandardPartChildren")
+
+  // Relation to BOMItem (one StandardPart can be used in many BOMItems)
+  bomItems        BOMItem[]
+
+  @@index([partNumber])
 }
