@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent, useCallback } from 'react';
 import { StandardPart } from '@/lib/types'; // Adjust path as necessary
 import { useRouter } from 'next/navigation'; // For redirection
 
@@ -25,7 +25,7 @@ const EditStandardPartForm: React.FC<EditStandardPartFormProps> = ({ initialData
   const [formError, setFormError] = useState<string | null>(null); // For form submission
 
   // Function to get all descendants of a given part ID
-  const getDescendantIds = (partId: number, parts: StandardPart[]): number[] => {
+  const getDescendantIds = useCallback((partId: number, parts: StandardPart[]): number[] => {
     let descendants: number[] = [];
     const children = parts.filter(p => p.parentId === partId);
     for (const child of children) {
@@ -33,7 +33,7 @@ const EditStandardPartForm: React.FC<EditStandardPartFormProps> = ({ initialData
       descendants = descendants.concat(getDescendantIds(child.id, parts));
     }
     return descendants;
-  };
+  }, []);
 
   useEffect(() => {
     // Fetch all standard parts for parent selection

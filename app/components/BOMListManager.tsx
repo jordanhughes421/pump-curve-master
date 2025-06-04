@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent, useCallback } from 'react';
 import { BOM, CreateBOMPayload, GetBOMsResponse, ApiError } from '@/lib/types';
 
 // Update props to include onBomUpdated
@@ -29,7 +29,7 @@ const BOMListManager: React.FC<BOMListManagerProps> = ({ pumpId, onSelectBOM, se
   const [editingBomName, setEditingBomName] = useState('');
 
 
-  const fetchBOMs = async (selectBomIdAfterFetch?: string | null) => {
+  const fetchBOMs = useCallback(async (selectBomIdAfterFetch?: string | null) => {
     if (!pumpId) return;
     setIsLoading(true);
     setError(null);
@@ -53,11 +53,11 @@ const BOMListManager: React.FC<BOMListManagerProps> = ({ pumpId, onSelectBOM, se
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [pumpId, onSelectBOM]);
 
   useEffect(() => {
     fetchBOMs();
-  }, [pumpId, fetchBOMs]);
+  }, [fetchBOMs]);
 
   const handleCreateBOM = async (e: FormEvent) => {
     e.preventDefault();

@@ -22,6 +22,7 @@ export interface BOMItemCustomField {
 export interface BOMItem {
   id: number;
   bomId: number;
+  standardPartId?: number | null; // Added this line
   partNumber: string;
   description: string;
   quantity: number;
