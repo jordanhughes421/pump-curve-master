@@ -22,7 +22,7 @@ export async function detectCycle<T extends { id: number; parentId: number | nul
     return true; // Item cannot be its own parent
   }
 
-  let currentParentId = proposedParentId;
+  let currentParentId: number | null = proposedParentId;
   const visitedIds = new Set<number>(); // To handle potential infinite loops in malformed data (though less likely with DB constraints)
 
   while (currentParentId !== null) {
