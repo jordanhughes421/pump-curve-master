@@ -57,7 +57,7 @@ const BOMListManager: React.FC<BOMListManagerProps> = ({ pumpId, onSelectBOM, se
 
   useEffect(() => {
     fetchBOMs();
-  }, [pumpId]);
+  }, [pumpId, fetchBOMs]);
 
   const handleCreateBOM = async (e: FormEvent) => {
     e.preventDefault();

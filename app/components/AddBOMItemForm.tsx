@@ -166,7 +166,7 @@ const AddBOMItemForm: React.FC<AddBOMItemFormProps> = ({ bomId, parentId, onBOMI
     if (selectedStandardPartId && selectedStandardPartChildren && selectedStandardPartChildren.length > 0) {
         const rootSp = standardParts.find(p => p.id === selectedStandardPartId);
         if (rootSp) {
-            const result = await addStandardPartAssemblyToBOM(rootSp, bomId, parentId);
+            const result = await addStandardPartAssemblyToBOM(rootSp, bomId, parentId ?? null);
             if (result.success) {
                 setSuccessMessage(`Standard Part Assembly "${rootSp.partNumber}" and its children added successfully!`);
                 clearForm();

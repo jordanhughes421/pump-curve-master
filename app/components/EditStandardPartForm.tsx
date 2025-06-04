@@ -57,7 +57,7 @@ const EditStandardPartForm: React.FC<EditStandardPartFormProps> = ({ initialData
       }
     };
     fetchAllParts();
-  }, [initialData.id]);
+  }, [initialData.id, getDescendantIds]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
